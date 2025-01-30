@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(service_template CXX)
+project(mtquiz-service CXX)
 
 
 # Adding userver dependency
@@ -26,7 +26,7 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/hello.hpp
     src/hello.cpp
 )
-target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::core)
+target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::postgresql)
 
 
 # The Service
@@ -36,7 +36,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
 
 # Unit Tests
 add_executable(${PROJECT_NAME}_unittest
-    src/hello_test.cpp
 )
 target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs userver::utest)
 add_google_tests(${PROJECT_NAME}_unittest)
@@ -44,7 +43,6 @@ add_google_tests(${PROJECT_NAME}_unittest)
 
 # Benchmarks
 add_executable(${PROJECT_NAME}_benchmark
-    src/hello_benchmark.cpp
 )
 target_link_libraries(${PROJECT_NAME}_benchmark PRIVATE ${PROJECT_NAME}_objs userver::ubench)
 add_google_benchmark_tests(${PROJECT_NAME}_benchmark)
