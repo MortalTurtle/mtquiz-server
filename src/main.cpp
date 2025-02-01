@@ -6,8 +6,7 @@
 #include <userver/testsuite/testsuite_support.hpp>
 #include <userver/storages/postgres/component.hpp>
 #include <userver/utils/daemon_run.hpp>
-
-#include "hello.hpp"
+#include "handlers/groups/create_group.hpp"
 
 int main(int argc, char* argv[]) {
   auto component_list = userver::components::MinimalServerComponentList()
@@ -18,7 +17,7 @@ int main(int argc, char* argv[]) {
                             .Append<userver::components::Postgres>("mtquiz-db-1")
                             .Append<userver::clients::dns::Component>();
 
-  mtquiz_service::AppendHello(component_list);
+  mtquiz_service::groups::AppendCreateGroup(component_list);
 
   return userver::utils::DaemonMain(argc, argv, component_list);
 }
