@@ -6,22 +6,57 @@ servers:
     - url: http://localhost:8080/
 components:
     schemas:
+        user:
+            type: object
+            properties:
+                id:
+                    description: internal user id
+                    type: string
+                username:
+                    type: string
+                password:
+                    description: user password
+                    type: string
+            required:
+                - username
         group:
             type: object
             properties:
                 id:
                     type: string
-                    required: true
                 name:
                     type: string
-                    required: true
+            required:
+              - id
+              - name
+        test:
+            type: object
+            properties:
+                id:
+                    type: string
+                groupId:
+                    type: string
+                ownerId:
+                    type: string
+                name:
+                    type: string
+                minScore:
+                    type: integer
+                description:
+                    type: string
+            required:
+              - groupId
+              - ownerId
+              - name
+              - description
         error:
             type: object
             properties:
                 detail:
                     description: error message
                     type: string
-                    required: true
+            required:
+              - detail
     responses:
         UnauthorizedError:
             description: UserId header is missing or invalid
@@ -31,37 +66,61 @@ components:
             in: header
             name: X-User-Auth-Token
 paths:
-    /users:
+    /v1/users:
         post:
-            description: create user
+            description: create user, must send password
             requestBody:
                 required: true
                 content:
                     application/json:
-                        schema:
-                            type: object
-                            properties:
-                                login:
-                                    description: user selected login
-                                    type: string
-                                    required: true
-                                password:
-                                    description: user selected password
-                                    type: string
-                                    required: true    
+                        schema: 
+                            $ref: "#/components/schemas/user"
             responses:
                 '200':
+                    description: OK
                     content:
                         application/json:
                             schema:
                                 type: string
                                 description: user id
                 '400':
+                    description: wrong input data
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/error"
-    /login:
+    /v1/users/{id}:
+        patch:
+            description: update user info
+            parameters:
+                -   name: id
+                    in: path
+                    description: user id to edit
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema: 
+                            $ref: "#/components/schemas/user"
+            security:
+                - UserAuthToken: []
+            responses:
+                '200':
+                    description: user edited
+                '400':
+                    description: invalid input
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/error"
+                '404':
+                    description: user not found
+                '401':
+                    $ref: '#components/responses/UnauthorizedError'
+    /v1/login:
         post:
             description: login into user account
             requestBody:
@@ -69,30 +128,21 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
-                            properties:
-                                login:
-                                    description: user login
-                                    type: string
-                                    required: true
-                                password:
-                                    description: user password
-                                    type: string
-                                    required: true
-            respones:
+                            $ref: '#/components/schemas/user'
+            responses:
                 '200':
+                    description: OK
                     content:
                         application/json:
                             schema:
-                                type: string
-                                description: user internal id
+                                $ref: '#/components/schemas/user'
                 '400':
                     description: invalid input
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/error"
-    /groups:
+    /v1/groups:
         post:
             description: creates group
             requestBody:
@@ -105,11 +155,12 @@ paths:
                                 name:
                                     description: group name
                                     type: string
-                                    required: true
                                 description:
                                     description: group description
                                     type: string
-                                    required: true
+                            required:
+                              - name
+                              - description
             security:
                 - UserTicketAuth: []
             responses:
@@ -128,3 +179,156 @@ paths:
                                 $ref: "#/components/schemas/error"
                 '401':
                     $ref: '#components/responses/UnauthorizedError'
+    /v1/gpoups/{id}:
+        get:
+            description: get group info
+            parameters:
+                -   name: id
+                    in: path
+                    description: group id to edit
+                    required: true
+                    schema:
+                        type: string
+            security:
+                -   UserTicketAuth: []
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/group"
+                '404':
+                    description: group not found
+                '401':
+                    $ref: '#components/responses/UnauthorizedError'
+        patch:
+            description: edit user
+            parameters:
+                -   name: id
+                    in: path
+                    description: group id to edit
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#components/schemas/group'
+            security:
+                -   UserTicketAuth: []
+            responses:
+                '200':
+                    description: group edited
+                '404':
+                    description: group not found
+                '401':
+                    $ref: '#components/responses/UnauthorizedError'
+    /v1/groups/{groupId}/tests:
+        post:
+            description: create test for group
+            parameters:
+                -   in: path
+                    name: id
+                    description: group id that created test will be attached to
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                    description: group name
+                                description:
+                                    type: string
+                                    description: group description
+                            required:
+                              - name
+                              - description
+            security:
+              - UserAuthToken: []
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/test'
+                '404':
+                    description: group not found
+                '400':
+                    description: invalid input parameters
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/error"
+                '401':
+                    $ref: '#components/responses/UnauthorizedError'
+    /v1/groups/{groupId}/tests/{id}:
+        get:
+            description: get test
+            parameters:
+                -   in: path
+                    name: groupid
+                    description: group id that test is attached to
+                    required: true
+                    schema:
+                        type: string
+                -   in: path
+                    name: id
+                    description: testId
+                    required: true
+                    schema:
+                        type: string
+            security:
+              - UserAuthToken: []
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/test'
+                '404':
+                    description: not found
+                '400':
+                    description: invalid input
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/error'
+                '401':
+                    $ref: '#components/responses/UnauthorizedError'
+        patch:
+            description: edit test
+            parameters:
+                -   in: path
+                    name: groupid
+                    description: group id that test is attached to
+                    required: true
+                    schema:
+                        type: string
+                -   in: path
+                    name: id
+                    description: testId
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#components/schemas/test'
+            security:
+              - UserAuthToken: []
+            
+            
+                  

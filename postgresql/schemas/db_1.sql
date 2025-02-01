@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS quizdb.groups(
 CREATE TABLE IF NOT EXISTS quizdb.users(
     id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(100) NOT NULL,
+    password_hash TEXT NOT NULL,
     group_id TEXT
 );
 
