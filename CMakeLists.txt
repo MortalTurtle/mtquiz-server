@@ -25,9 +25,10 @@ userver_setup_environment()
 add_library(${PROJECT_NAME}_objs OBJECT
     src/hello.hpp
     src/hello.cpp
+    src/handlers/groups/create_group.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::postgresql)
-
+include_directories(utils src/utils)
 
 # The Service
 add_executable(${PROJECT_NAME} src/main.cpp)
