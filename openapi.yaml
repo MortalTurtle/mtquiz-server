@@ -1,0 +1,130 @@
+openapi: "3.0.2"
+info:
+    title: MtQuiz server for taking tests
+    version: "1.0"
+servers:
+    - url: http://localhost:8080/
+components:
+    schemas:
+        group:
+            type: object
+            properties:
+                id:
+                    type: string
+                    required: true
+                name:
+                    type: string
+                    required: true
+        error:
+            type: object
+            properties:
+                detail:
+                    description: error message
+                    type: string
+                    required: true
+    responses:
+        UnauthorizedError:
+            description: UserId header is missing or invalid
+    securitySchemes:
+        UserTicketAuth:
+            type: apiKey
+            in: header
+            name: X-User-Auth-Token
+paths:
+    /users:
+        post:
+            description: create user
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                login:
+                                    description: user selected login
+                                    type: string
+                                    required: true
+                                password:
+                                    description: user selected password
+                                    type: string
+                                    required: true    
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                description: user id
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/error"
+    /login:
+        post:
+            description: login into user account
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                login:
+                                    description: user login
+                                    type: string
+                                    required: true
+                                password:
+                                    description: user password
+                                    type: string
+                                    required: true
+            respones:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                description: user internal id
+                '400':
+                    description: invalid input
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/error"
+    /groups:
+        post:
+            description: creates group
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                name:
+                                    description: group name
+                                    type: string
+                                    required: true
+                                description:
+                                    description: group description
+                                    type: string
+                                    required: true
+            security:
+                - UserTicketAuth: []
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                description: id of created group
+                '400':
+                    description: invalid input parameters
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/error"
+                '401':
+                    $ref: '#components/responses/UnauthorizedError'
