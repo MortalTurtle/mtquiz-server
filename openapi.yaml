@@ -60,8 +60,6 @@ components:
                     type: string
                 typeId:
                     type: string
-                answer:
-                    type: string
                 weight:
                     type: integer
                 text:
@@ -70,6 +68,15 @@ components:
               - testId
               - typeId
               - text
+        answer:
+            properties:
+                questionId:
+                    type: string
+                answer:
+                    type: string
+            required:
+                - questionId
+                - answer
         error:
             type: object
             properties:
@@ -542,3 +549,142 @@ paths:
                     $ref: '#/components/responses/UnauthorizedError'
                 '404':
                     description: not found
+    /v1/answers:
+        post:
+            description: add answers or false answers for question
+            parameters:
+                -   in: query
+                    name: testId
+                    required: true
+                    schema:
+                        type: string
+                -   in: query
+                    name: falseAnswers
+                    description: value is irrelevant, if passed all answers will be added as false answers
+                    required: true
+                    x-isFlag: true
+                    allowEmptyValue: true
+                    schema:
+                        type: boolean
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/answer'
+            security:
+              - UserAuthToken: []
+            responses:
+                '200':
+                    description: OK
+                '400':
+                    $ref: "#/components/responses/InvalidInput"
+                '401':
+                    $ref: "#/components/responses/UnauthorizedError"
+        put:
+            description: replace all existing question answers or all existing false answers
+            parameters:
+                -   in: query
+                    name: testId
+                    required: true
+                    schema:
+                        type: string
+                -   in: query
+                    name: falseAnswers
+                    description: value is irrelevant, if passed all answers will be added as false answers
+                    required: true
+                    x-isFlag: true
+                    allowEmptyValue: true
+                    schema:
+                        type: boolean
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/answer'
+            security:
+              - UserAuthToken: []
+            responses:
+                '200':
+                    description: OK
+                '400':
+                    $ref: "#/components/responses/InvalidInput"
+                '401':
+                    $ref: "#/components/responses/UnauthorizedError"
+    /v1/answers/submit:
+        post:
+            description: submit user answers on questions in test
+            parameters:
+                -   in: query
+                    name: testId
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                $ref: "#/components/schemas/answer"
+            security:
+              - UserAuthToken: []
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                description: user result
+                '400':
+                    $ref: '#/components/responses/InvalidInput'
+                '401':
+                    $ref: '#/components/responses/UnauthorizedError'
+                '404':
+                    description: test not found
+    /v1/results:
+        get:
+            description: get user results in his current group, from newest to latest
+            parameters:
+                -   in: query
+                    name: offset
+                    required: false
+                    schema:
+                        type: integer
+                -   in: query
+                    name: limit
+                    required: false
+                    schema:
+                        type: integer
+            security:
+              - UserAuthToken: []
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        test:
+                                            $ref: "#/components/schemas/test"
+                                        score:
+                                            type: integer
+                                    required:
+                                      - test
+                                      - score
+                '400':
+                    $ref: "#/components/responses/InvalidInput"
+                '401':
+                    $ref: "#/components/responses/UnauthorizedError"
+
+
