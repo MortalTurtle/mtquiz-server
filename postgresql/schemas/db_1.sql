@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS quizdb.groups(
 CREATE TABLE IF NOT EXISTS quizdb.users(
     id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(100) NOT NULL,
+    password_hash TEXT NOT NULL,
     group_id TEXT
 );
 
@@ -52,14 +53,14 @@ CREATE TABLE IF NOT EXISTS quizdb.question_type(
 );
 
 INSERT INTO quizdb.question_type(type, description) VALUES
-('Choose', 'You have to choose the right answer'),
+('Choose Single', 'You have to choose the right answer'),
+('Choose Multiple', 'You have to choose the right answers'),
 ('Write', 'You have to write the right answer');
 
 CREATE TABLE IF NOT EXISTS quizdb.test_questions(
     id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
     test_id TEXT REFERENCES quizdb.tests(id),
     type_id TEXT REFERENCES quizdb.question_type(id),
-    answer TEXT,
     weight INTEGER,
     text TEXT NOT NULL,
     created_ts TIMESTAMP DEFAULT NOW()
@@ -67,11 +68,19 @@ CREATE TABLE IF NOT EXISTS quizdb.test_questions(
 
 CREATE INDEX IF NOT EXISTS idx_by_created_ts_questions ON quizdb.test_questions(created_ts);
 
+CREATE TABPE IF NOT EXISTS quizdb.question_answers(
+    question_id TEXT REFERENCES quizdb.test_questions(id),
+    answer TEXT NOT NULL,
+    UNIQUE(question_id, answer)
+);
+
 CREATE TABLE IF NOT EXISTS quizdb.question_false_answers(
     question_id TEXT REFERENCES quizdb.test_questions(id),
-    text TEXT NOT NULL,
-    UNIQUE(question_id, text)
+    answer TEXT NOT NULL,
+    UNIQUE(question_id, answer)
 );
+CREATE INDEX IF NOT EXISTS idx_by_question_id_answers ON quizdb.question_answers(question_id);
+CREATE INDEX IF NOT EXISTS idx_by_question_id_false_answers ON quizdb.question_false_answers(question_id);
 
 CREATE TABLE IF NOT EXISTS quizdb.test_results(
     user_id TEXT REFERENCES quizdb.users(id),
