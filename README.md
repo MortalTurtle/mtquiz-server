@@ -1,4 +1,6 @@
-## Makefile
+MtQuiz server for creating tests in groups and sharing them with your friends or someone
+
+ ## Makefile
 
 Makefile contains typicaly useful targets for development:
 
