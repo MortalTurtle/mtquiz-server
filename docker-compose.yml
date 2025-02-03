@@ -16,19 +16,19 @@ services:
         networks:
           - postgres
 
-    mtquiz-service-container:
+    mtquiz_service-container:
         image: ghcr.io/userver-framework/ubuntu-22.04-userver-pg:latest
         privileged: true
         environment:
           <<: *db_env
           PREFIX: ${PREFIX:-~/.local}
-          CCACHE_DIR: /mtquiz-service/.ccache
+          CCACHE_DIR: /mtquiz_service/.ccache
           CORES_DIR: /cores
         volumes:
-          - .:/mtquiz-service:rw
+          - .:/mtquiz_service:rw
         ports:
           - 8080:8080
-        working_dir: /mtquiz-service
+        working_dir: /mtquiz_service
         entrypoint:
           - ./tests/run_as_user.sh
         depends_on:
