@@ -17,6 +17,11 @@ CREATE TABLE IF NOT EXISTS quizdb.users(
     group_id TEXT
 );
 
+CREATE TABLE IF NOT EXISTS quizdb.session_tokens(
+    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id TEXT REFERENCES quizdb.users(id)
+)
+
 CREATE TABLE IF NOT EXISTS quizdb.group_roles(
     id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL

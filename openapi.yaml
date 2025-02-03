@@ -170,7 +170,7 @@ paths:
                     description: user not found
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
-    /v1/login:
+    /v1/users/login:
         post:
             description: login into user account
             requestBody:

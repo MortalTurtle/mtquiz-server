@@ -50,9 +50,29 @@ components_manager:
             throttling_enabled: false
             url_trailing_slash: strict-match
 
-        handler-groups-create:
+        handler-group-create:
             path: /groups
             method: POST
+            task_processor: main-task-processor
+        
+        handler-user-get:
+            path: /v1/users
+            method: GET
+            task_processor: main-task-processor
+
+        handler-user-add:
+            path: /v1/users
+            method: POST
+            task_processor: main-task-processor
+        
+        handler-user-edit:
+            path: /v1/users/{id}
+            method: PATCH
+            task_processor: main-task-processor
+        
+        handler-user-login:
+            path: /v1/users/login
+            method: post
             task_processor: main-task-processor
 
         mtquiz-db-1:

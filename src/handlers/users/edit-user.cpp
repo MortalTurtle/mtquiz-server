@@ -1,4 +1,4 @@
-#include "create_group.hpp"
+#include "edit-user.hpp"
 
 #include <fmt/format.h>
 
@@ -12,16 +12,15 @@
 namespace mtquiz_service {
 
 namespace handlers {
-namespace groups {
-
+namespace users {
 namespace {
 
-class CreateGroup final : public userver::server::handlers::HttpHandlerBase {
+class EditUser final : public userver::server::handlers::HttpHandlerBase {
  public:
-  static constexpr std::string_view kName = "handler-group-create";
+  static constexpr std::string_view kName = "handler-user-edit";
 
-  CreateGroup(const userver::components::ComponentConfig& config,
-              const userver::components::ComponentContext& component_context)
+  EditUser(const userver::components::ComponentConfig& config,
+           const userver::components::ComponentContext& component_context)
       : HttpHandlerBase(config, component_context),
         pg_cluster_(
             component_context
@@ -37,10 +36,9 @@ class CreateGroup final : public userver::server::handlers::HttpHandlerBase {
 
 }  // namespace
 
-void AppendCreateGroup(userver::components::ComponentList& component_list) {
-  component_list.Append<CreateGroup>();
+void AppendEditUser(userver::components::ComponentList& component_list) {
+  component_list.Append<EditUser>();
 }
-
-}  // namespace groups
+}  // namespace users
 }  // namespace handlers
 }  // namespace mtquiz_service

@@ -16,6 +16,10 @@ userver_setup_environment()
 # Common sources
 add_library(${PROJECT_NAME}_objs OBJECT
     src/handlers/groups/create_group.cpp
+    src/handlers/users/login/user-login.cpp
+    src/handlers/users/add-user.cpp
+    src/handlers/users/edit-user.cpp
+    src/handlers/users/get-user.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::postgresql)
 include_directories(utils src/utils)
