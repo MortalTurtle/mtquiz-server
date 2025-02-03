@@ -5,7 +5,7 @@
 namespace mtquiz_service {
 
 namespace groups {
-void AppendCreateGroup(userver::components::ComponentList &component_list);
+void AppendCreateGroup(userver::components::ComponentList& component_list);
 
-} // namespace groups
-} // namespace mtquiz_service
+}  // namespace groups
+}  // namespace mtquiz_service

@@ -20,7 +20,7 @@ class CreateGroup final : public userver::server::handlers::HttpHandlerBase {
   static constexpr std::string_view kName = "handler-groups-create";
 
   CreateGroup(const userver::components::ComponentConfig& config,
-        const userver::components::ComponentContext& component_context)
+              const userver::components::ComponentContext& component_context)
       : HttpHandlerBase(config, component_context),
         pg_cluster_(
             component_context
@@ -40,6 +40,6 @@ void AppendCreateGroup(userver::components::ComponentList& component_list) {
   component_list.Append<CreateGroup>();
 }
 
-} // namespace groups
+}  // namespace groups
 
 }  // namespace mtquiz_service
