@@ -9,7 +9,9 @@ compile_commands.json
 !.vscode/cmake-variants.yaml
 !.vscode/README.md
 .cores/
+.pgdata/
 cmake-build-*
 Testing/
 .DS_Store
 Makefile.local
+CMakeUserPresets.json
