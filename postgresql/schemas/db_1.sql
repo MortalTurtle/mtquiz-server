@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS quizdb.test_questions(
 
 CREATE INDEX IF NOT EXISTS idx_by_created_ts_questions ON quizdb.test_questions(created_ts);
 
-CREATE TABPE IF NOT EXISTS quizdb.question_answers(
+CREATE TABLE IF NOT EXISTS quizdb.question_answers(
     question_id TEXT REFERENCES quizdb.test_questions(id),
     answer TEXT NOT NULL,
     UNIQUE(question_id, answer)
