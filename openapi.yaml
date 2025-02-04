@@ -17,11 +17,13 @@ components:
                     type: string
                 username:
                     type: string
-                password:
+                password_hash:
                     description: user password
                     type: string
             required:
+                - id
                 - username
+                - password_hash
         group:
             type: object
             properties:
@@ -121,8 +123,18 @@ paths:
                     description: OK
                     content:
                         application/json:
-                            schema: 
-                                $ref: '#/components/schemas/user'
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        type: string
+                                    username:
+                                        type: string
+                                    groupId:
+                                        type: string
+                                required:
+                                  - id
+                                  - username
                 '404':
                     description: not found
         post:
@@ -131,16 +143,21 @@ paths:
                 required: true
                 content:
                     application/json:
-                        schema: 
-                            $ref: "#/components/schemas/user"
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                password:
+                                    type: string
             responses:
                 '200':
                     description: OK
                     content:
-                        application/json:
+                        text/plain:
                             schema:
                                 type: string
-                                description: user id
+                                description: created user id
                 '400':
                     $ref: '#/components/responses/InvalidInput'
     /v1/users/{id}:
@@ -157,8 +174,13 @@ paths:
                 required: true
                 content:
                     application/json:
-                        schema: 
-                            $ref: "#/components/schemas/user"
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                password:
+                                    type: string
             security:
                 - UserAuthToken: []
             responses:

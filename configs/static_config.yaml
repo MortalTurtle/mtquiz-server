@@ -51,7 +51,7 @@ components_manager:
             url_trailing_slash: strict-match
 
         handler-group-create:
-            path: /groups
+            path: /v1/groups
             method: POST
             task_processor: main-task-processor
         
@@ -72,7 +72,7 @@ components_manager:
         
         handler-user-login:
             path: /v1/users/login
-            method: post
+            method: POST
             task_processor: main-task-processor
 
         mtquiz-db-1:

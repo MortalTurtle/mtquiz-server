@@ -14,13 +14,14 @@ CREATE TABLE IF NOT EXISTS quizdb.users(
     id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(100) NOT NULL,
     password_hash TEXT NOT NULL,
-    group_id TEXT
+    group_id TEXT,
+    UNIQUE(username)
 );
 
 CREATE TABLE IF NOT EXISTS quizdb.session_tokens(
     id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id TEXT REFERENCES quizdb.users(id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS quizdb.group_roles(
     id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),

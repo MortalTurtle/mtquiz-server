@@ -20,6 +20,10 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/handlers/users/add-user.cpp
     src/handlers/users/edit-user.cpp
     src/handlers/users/get-user.cpp
+    src/utils/lib/auth.cpp
+    src/utils/repositories/user_repo.cpp
+    src/utils/models/Error.cpp
+    src/utils/models/user.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::postgresql)
 include_directories(utils src/utils)
