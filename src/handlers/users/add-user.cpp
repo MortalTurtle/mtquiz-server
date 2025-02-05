@@ -42,34 +42,37 @@ class AddUser final : public userver::server::handlers::HttpHandlerBase {
                 .FindComponent<userver::components::Postgres>("mtquiz-db-1")
                 .GetCluster()) {}
 
-  bool CheckUserInput(const std::string& username, const std::string& password) const {
-    return std::regex_match(password, passwordRegex) && std::regex_match(username, usernameRegex);
+  bool CheckUserInput(const std::string& username,
+                      const std::string& password) const {
+    return std::regex_match(password, passwordRegex) &&
+           std::regex_match(username, usernameRegex);
   }
 
   std::string HandleRequestThrow(
       const userver::server::http::HttpRequest& request,
       userver::server::request::RequestContext&) const override {
-    auto request_body = userver::formats::json::FromString(request.RequestBody());
+    auto request_body =
+        userver::formats::json::FromString(request.RequestBody());
     auto username = request_body["username"].As<std::optional<std::string>>();
     auto password = request_body["password"].As<std::optional<std::string>>();
     if (!username.has_value() || !password.has_value()) {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::http::BadRequest);
       return ToString(userver::formats::json::ValueBuilder{
-        security::Error{"Some parameter is missing",
-        "Wrong number of parameters"
-        }}.ExtractValue()
-      );
+          security::Error{"Some parameter is missing",
+                          security::ErrorTypes::kWrongAmountOfParameters}}
+                          .ExtractValue());
     }
     if (!CheckUserInput(username.value(), password.value())) {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::http::BadRequest);
       return ToString(userver::formats::json::ValueBuilder{
-        security::Error{"password can contain alphabet characters and special characters. "
-         "Username must only contain regular arphabet characters",
-        "Wrong parameter or parameters format"
-        }}.ExtractValue()
-      );
+          security::Error{
+              "password can contain alphabet characters and special "
+              "characters. "
+              "Username must only contain regular arphabet characters",
+              security::ErrorTypes::kWrongParameterFormat}}
+                          .ExtractValue());
     }
     repositories::UserRepository user_repo(pg_cluster_);
     auto user = user_repo.CrateUser(username.value(), password.value());

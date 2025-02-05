@@ -14,7 +14,11 @@ struct User {
   std::optional<std::string> group_id;
 };
 
-userver::formats::json::Value Serialize(const User& user,
+userver::formats::json::Value Serialize(
+    const User& user,
     userver::formats::serialize::To<userver::formats::json::Value>);
+
+User Parse(userver::formats::json::Value value,
+           userver::formats::parse::To<User>);
 
 }  // namespace mtquiz_service

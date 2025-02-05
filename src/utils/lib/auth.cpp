@@ -1,5 +1,7 @@
 #include "auth.hpp"
 #include <optional>
+#include <string>
+#include <userver/crypto/hash.hpp>
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/cluster_types.hpp>
 #include <userver/storages/postgres/io/row_types.hpp>
@@ -20,6 +22,23 @@ std::optional<Session> GetSessionInfo(
                           "WHERE id = $1",
                           id);
   if (res.IsEmpty()) return std::nullopt;
+  return res.AsSingleRow<Session>(userver::storages::postgres::kRowTag);
+}
+
+std::optional<Session> TryLogin(
+    userver::storages::postgres::ClusterPtr pg_cluster,
+    std::string_view username, std::string_view password) {
+  auto hash = userver::crypto::hash::Sha256(password);
+  auto res = pg_cluster->Execute(
+      userver::storages::postgres::ClusterHostType::kSlave,
+      "SELECT id FROM quizdb.users WHERE username = $1 AND password_hash = $2",
+      username, hash);
+  if (res.IsEmpty()) return std::nullopt;
+  std::string user_id = res[0]["id"].As<std::string>();
+  res = pg_cluster->Execute(
+      userver::storages::postgres::ClusterHostType::kMaster,
+      "INSERT INTO quizdb.session_tokens(user_id) VALUES ($1) RETURNING *",
+      user_id);
   return res.AsSingleRow<Session>(userver::storages::postgres::kRowTag);
 }
 }  // namespace security

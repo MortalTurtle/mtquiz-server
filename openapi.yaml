@@ -17,13 +17,9 @@ components:
                     type: string
                 username:
                     type: string
-                password_hash:
-                    description: user password
-                    type: string
             required:
                 - id
                 - username
-                - password_hash
         group:
             type: object
             properties:
@@ -124,17 +120,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    id:
-                                        type: string
-                                    username:
-                                        type: string
-                                    groupId:
-                                        type: string
-                                required:
-                                  - id
-                                  - username
+                                $ref: '#/components/schemas/user'
                 '404':
                     description: not found
         post:
@@ -160,16 +146,8 @@ paths:
                                 description: created user id
                 '400':
                     $ref: '#/components/responses/InvalidInput'
-    /v1/users/{id}:
         patch:
-            description: edit user, updates all fields according to passed values
-            parameters:
-                -   name: id
-                    in: path
-                    description: user id to edit
-                    required: true
-                    schema:
-                        type: string
+            description: edit user that sent the request, updates all fields according to passed values
             requestBody:
                 required: true
                 content:
@@ -188,8 +166,6 @@ paths:
                     description: user edited
                 '400':
                     $ref: '#/components/responses/InvalidInput'
-                '404':
-                    description: user not found
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
     /v1/users/login:
@@ -200,16 +176,27 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/user'
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                password:
+                                    type: string
+                            required:
+                              - username
+                              - password
             responses:
                 '200':
                     description: OK
                     content:
-                        application/json:
+                        text/plain:
                             schema:
-                                $ref: '#/components/schemas/user'
+                                type: string
+                                description: X-User-Auth-Token
                 '400':
                     $ref: '#/components/responses/InvalidInput'
+                '404':
+                    description: No user with such username found
     /v1/groups:
         post:
             description: creates group
