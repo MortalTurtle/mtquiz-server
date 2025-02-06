@@ -27,9 +27,19 @@ components:
                     type: string
                 name:
                     type: string
+                description:
+                    type: string
             required:
               - id
               - name
+              - description
+        groupRole:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
         test:
             type: object
             properties:
@@ -222,7 +232,7 @@ paths:
                 '200':
                     description: OK
                     content:
-                        application/json:
+                        text/plain:
                             schema:
                                 type: string
                                 description: id of created group

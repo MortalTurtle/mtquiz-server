@@ -16,12 +16,15 @@ userver_setup_environment()
 # Common sources
 add_library(${PROJECT_NAME}_objs OBJECT
     src/handlers/groups/create_group.cpp
+    src/handlers/groups/get_group.cpp
     src/handlers/users/login/user-login.cpp
     src/handlers/users/add-user.cpp
     src/handlers/users/edit-user.cpp
     src/handlers/users/get-user.cpp
     src/utils/lib/auth.cpp
     src/utils/repositories/user_repo.cpp
+    src/utils/repositories/group_repo.cpp
+    src/utils/repositories/group_role_repo.cpp
     src/utils/models/Error.cpp
     src/utils/models/user.cpp
 )

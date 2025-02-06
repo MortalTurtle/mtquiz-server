@@ -215,7 +215,7 @@ async def test_user_patch_no_header(service_client):
     assert response.status == 401
 
 
-async def test_user_patch_no_username_taken_password_has_not_changed(service_client):
+async def test_user_patch_username_taken_nothing_changed(service_client):
     id = await setup_for_tests.setup_user(service_client)
     auth_token = await setup_for_tests.setup_user_login(service_client)
     data = {"username": "newusername", "password": "qwerty"}

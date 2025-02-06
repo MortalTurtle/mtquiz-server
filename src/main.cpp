@@ -7,6 +7,7 @@
 #include <userver/testsuite/testsuite_support.hpp>
 #include <userver/utils/daemon_run.hpp>
 #include "handlers/groups/create_group.hpp"
+#include "handlers/groups/get_group.hpp"
 #include "handlers/users/add-user.hpp"
 #include "handlers/users/edit-user.hpp"
 #include "handlers/users/get-user.hpp"
@@ -23,6 +24,7 @@ int main(int argc, char* argv[]) {
           .Append<userver::clients::dns::Component>();
 
   mtquiz_service::handlers::groups::AppendCreateGroup(component_list);
+  mtquiz_service::handlers::groups::AppendGetGroup(component_list);
   mtquiz_service::handlers::users::AppendAddUser(component_list);
   mtquiz_service::handlers::users::AppendEditUser(component_list);
   mtquiz_service::handlers::users::AppendGetUser(component_list);

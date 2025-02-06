@@ -4,6 +4,8 @@ DROP SCHEMA IF EXISTS quizdb CASCADE;
 
 CREATE SCHEMA IF NOT EXISTS quizdb;
 
+CREATE TYPE group_role AS ENUM('Owner', 'Contributor', 'Participant');
+
 CREATE TABLE IF NOT EXISTS quizdb.groups(
     id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
@@ -23,20 +25,10 @@ CREATE TABLE IF NOT EXISTS quizdb.session_tokens(
     user_id TEXT REFERENCES quizdb.users(id)
 );
 
-CREATE TABLE IF NOT EXISTS quizdb.group_roles(
-    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name TEXT NOT NULL
-);
-
-INSERT INTO quizdb.group_roles(name) VALUES
-('Owner'),
-('Contributor'),
-('Participant');
-
 CREATE TABLE IF NOT EXISTS quizdb.group_users(
     group_id TEXT REFERENCES quizdb.groups(id),
     user_id TEXT REFERENCES quizdb.users(id),
-    group_role_id TEXT REFERENCES quizdb.group_roles(id),
+    role group_role,
     UNIQUE(group_id, user_id)
 );
 
