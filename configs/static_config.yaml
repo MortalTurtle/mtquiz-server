@@ -80,6 +80,16 @@ components_manager:
             method: GET
             task_processor: main-task-processor
 
+        handler-group-patch:
+            path: /v1/groups/{id}
+            method: PATCH
+            task_processor: main-task-processor
+
+        handler-group-join:
+            path: /v1/groups/{id}/join
+            method: POST
+            task_processor: main-task-processor
+
         mtquiz-db-1:
             dbconnection: $dbconnection
             dbconnection#env: DB_CONNECTION

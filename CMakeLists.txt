@@ -17,6 +17,8 @@ userver_setup_environment()
 add_library(${PROJECT_NAME}_objs OBJECT
     src/handlers/groups/create_group.cpp
     src/handlers/groups/get_group.cpp
+    src/handlers/groups/edit_group.cpp
+    src/handlers/groups/join_group.cpp
     src/handlers/users/login/user-login.cpp
     src/handlers/users/add-user.cpp
     src/handlers/users/edit-user.cpp
