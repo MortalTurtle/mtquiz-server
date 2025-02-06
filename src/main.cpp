@@ -7,6 +7,11 @@
 #include <userver/testsuite/testsuite_support.hpp>
 #include <userver/utils/daemon_run.hpp>
 #include "handlers/groups/create_group.hpp"
+#include "handlers/groups/get_group.hpp"
+#include "handlers/users/add-user.hpp"
+#include "handlers/users/edit-user.hpp"
+#include "handlers/users/get-user.hpp"
+#include "handlers/users/login/user-login.hpp"
 
 int main(int argc, char* argv[]) {
   auto component_list =
@@ -18,7 +23,12 @@ int main(int argc, char* argv[]) {
           .Append<userver::components::Postgres>("mtquiz-db-1")
           .Append<userver::clients::dns::Component>();
 
-  mtquiz_service::groups::AppendCreateGroup(component_list);
+  mtquiz_service::handlers::groups::AppendCreateGroup(component_list);
+  mtquiz_service::handlers::groups::AppendGetGroup(component_list);
+  mtquiz_service::handlers::users::AppendAddUser(component_list);
+  mtquiz_service::handlers::users::AppendEditUser(component_list);
+  mtquiz_service::handlers::users::AppendGetUser(component_list);
+  mtquiz_service::handlers::users::AppendUserLogin(component_list);
 
   return userver::utils::DaemonMain(argc, argv, component_list);
 }

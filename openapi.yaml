@@ -17,10 +17,8 @@ components:
                     type: string
                 username:
                     type: string
-                password:
-                    description: user password
-                    type: string
             required:
+                - id
                 - username
         group:
             type: object
@@ -29,9 +27,19 @@ components:
                     type: string
                 name:
                     type: string
+                description:
+                    type: string
             required:
               - id
               - name
+              - description
+        groupRole:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
         test:
             type: object
             properties:
@@ -121,7 +129,7 @@ paths:
                     description: OK
                     content:
                         application/json:
-                            schema: 
+                            schema:
                                 $ref: '#/components/schemas/user'
                 '404':
                     description: not found
@@ -131,34 +139,36 @@ paths:
                 required: true
                 content:
                     application/json:
-                        schema: 
-                            $ref: "#/components/schemas/user"
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                password:
+                                    type: string
             responses:
                 '200':
                     description: OK
                     content:
-                        application/json:
+                        text/plain:
                             schema:
                                 type: string
-                                description: user id
+                                description: created user id
                 '400':
                     $ref: '#/components/responses/InvalidInput'
-    /v1/users/{id}:
         patch:
-            description: edit user, updates all fields according to passed values
-            parameters:
-                -   name: id
-                    in: path
-                    description: user id to edit
-                    required: true
-                    schema:
-                        type: string
+            description: edit user that sent the request, updates all fields according to passed values
             requestBody:
                 required: true
                 content:
                     application/json:
-                        schema: 
-                            $ref: "#/components/schemas/user"
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                password:
+                                    type: string
             security:
                 - UserAuthToken: []
             responses:
@@ -166,11 +176,9 @@ paths:
                     description: user edited
                 '400':
                     $ref: '#/components/responses/InvalidInput'
-                '404':
-                    description: user not found
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
-    /v1/login:
+    /v1/users/login:
         post:
             description: login into user account
             requestBody:
@@ -178,16 +186,27 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/user'
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                password:
+                                    type: string
+                            required:
+                              - username
+                              - password
             responses:
                 '200':
                     description: OK
                     content:
-                        application/json:
+                        text/plain:
                             schema:
-                                $ref: '#/components/schemas/user'
+                                type: string
+                                description: X-User-Auth-Token
                 '400':
                     $ref: '#/components/responses/InvalidInput'
+                '404':
+                    description: No user with such username found
     /v1/groups:
         post:
             description: creates group
@@ -213,7 +232,7 @@ paths:
                 '200':
                     description: OK
                     content:
-                        application/json:
+                        text/plain:
                             schema:
                                 type: string
                                 description: id of created group

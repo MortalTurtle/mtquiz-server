@@ -8,7 +8,7 @@ namespace handlers {
 
 namespace groups {
 
-void AppendCreateGroup(userver::components::ComponentList& component_list);
+void AppendGetGroup(userver::components::ComponentList& component_list);
 
 }  // namespace groups
 }  // namespace handlers

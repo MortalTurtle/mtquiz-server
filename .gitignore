@@ -7,9 +7,12 @@ compile_commands.json
 .vscode/
 !.vscode/c_cpp_properties.json
 !.vscode/cmake-variants.yaml
+!.vscode/settings.json
 !.vscode/README.md
 .cores/
+.pgdata/
 cmake-build-*
 Testing/
 .DS_Store
 Makefile.local
+CMakeUserPresets.json
