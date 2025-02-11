@@ -15,6 +15,9 @@ userver_setup_environment()
 
 # Common sources
 add_library(${PROJECT_NAME}_objs OBJECT
+    src/handlers/tests/get_tests_for_group.cpp
+    src/handlers/tests/create_test_for_group.cpp
+    src/handlers/tests/get_test.cpp
     src/handlers/groups/create_group.cpp
     src/handlers/groups/get_group.cpp
     src/handlers/groups/edit_group.cpp
@@ -27,6 +30,7 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/utils/repositories/user_repo.cpp
     src/utils/repositories/group_repo.cpp
     src/utils/repositories/group_role_repo.cpp
+    src/utils/repositories/tests_repo.cpp
     src/utils/models/Error.cpp
     src/utils/models/user.cpp
 )

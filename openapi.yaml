@@ -316,6 +316,18 @@ paths:
                     required: true
                     schema:
                         type: string
+                -   in: query
+                    name: ofset
+                    description: skip first n tests
+                    requried: false
+                    schema:
+                        type: integer
+                -   in: query
+                    name: limit
+                    description: how much tests to get
+                    required: false
+                    schema:
+                        type: integer
             security:
                 - UserAuthToken: []
             responses:
@@ -331,7 +343,6 @@ paths:
                     $ref: '#/components/responses/InvalidInput'
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
-
         post:
             description: create test for group
             parameters:
@@ -363,9 +374,10 @@ paths:
                 '200':
                     description: OK
                     content:
-                        application/json:
+                        text/plain:
                             schema:
-                                $ref: '#/components/schemas/test'
+                                type: string
+                                description: id of created test
                 '404':
                     description: group not found
                 '400':

@@ -90,6 +90,21 @@ components_manager:
             method: POST
             task_processor: main-task-processor
 
+        handler-get-tests:
+            path: /v1/groups/{groupId}/tests
+            method: GET
+            task_processor: main-task-processor
+        
+        handler-test-create:
+            path: /v1/groups/{groupId}/tests
+            method: POST
+            task_processor: main-task-processor
+
+        handler-test-get:
+            path: /v1/groups/{groupId}/tests/{id}
+            method: GET
+            task_processor: main-task-processor
+
         mtquiz-db-1:
             dbconnection: $dbconnection
             dbconnection#env: DB_CONNECTION
