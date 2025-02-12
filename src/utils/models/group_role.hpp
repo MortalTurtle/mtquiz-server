@@ -14,7 +14,7 @@ enum class Roles { kOwner, kParticipant, kContributor };
 
 template <>
 struct userver::storages::postgres::io::CppToUserPg<mtquiz_service::Roles> {
-  static constexpr DBTypeName postgres_name = "__pgtest.rainbow";
+  static constexpr DBTypeName postgres_name = "quizdb.group_role";
   static constexpr USERVER_NAMESPACE::utils::TrivialBiMap enumerators =
       [](auto selector) {
         return selector()

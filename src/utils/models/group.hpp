@@ -22,4 +22,10 @@ userver::formats::json::Value inline Serialize(
   return item.ExtractValue();
 }
 
+Group inline Parse(userver::formats::json::Value value,
+                   userver::formats::parse::To<Group>) {
+  return Group{value["id"].As<std::string>(), value["name"].As<std::string>(),
+               value["description"].As<std::string>()};
+}
+
 }  // namespace mtquiz_service

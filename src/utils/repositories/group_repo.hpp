@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <string>
 #include <string_view>
 #include <userver/storages/postgres/cluster.hpp>
 #include "models/group.hpp"
@@ -19,6 +20,11 @@ class GroupRepository {
                     std::string_view description);
 
   std::optional<Group> GetGroup(std::string_view group_id);
+
+  void JoinGroup(std::string_view user_id, std::string_view group_id);
+
+  void EditGroup(const Group& group, const std::optional<std::string>& new_name,
+                 const std::optional<std::string>& new_description);
 };
 
 }  // namespace repositories

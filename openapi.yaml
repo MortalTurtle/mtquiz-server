@@ -96,6 +96,8 @@ components:
     responses:
         UnauthorizedError:
             description: UserId header is missing or invalid
+        ForbiddenError:
+            description: user role does not allow acces
         InvalidInput:
             description: invalid input
             content:
@@ -287,6 +289,8 @@ paths:
                     description: group not found
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
+                '403':
+                    $ref: '#/components/responses/ForbiddenError'
     /v1/groups/{id}/join:
         post:
             description: join group
@@ -316,6 +320,18 @@ paths:
                     required: true
                     schema:
                         type: string
+                -   in: query
+                    name: offset
+                    description: skip first n tests
+                    required: false
+                    schema:
+                        type: integer
+                -   in: query
+                    name: limit
+                    description: how much tests to get
+                    required: false
+                    schema:
+                        type: integer
             security:
                 - UserAuthToken: []
             responses:
@@ -331,7 +347,6 @@ paths:
                     $ref: '#/components/responses/InvalidInput'
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
-
         post:
             description: create test for group
             parameters:
@@ -363,9 +378,10 @@ paths:
                 '200':
                     description: OK
                     content:
-                        application/json:
+                        text/plain:
                             schema:
-                                $ref: '#/components/schemas/test'
+                                type: string
+                                description: id of created test
                 '404':
                     description: group not found
                 '400':
@@ -423,7 +439,14 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/test'
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                description:
+                                    type: string
+                                minScoreToBeat:
+                                    type: integer
             security:
               - UserAuthToken: []
             responses:
@@ -431,6 +454,8 @@ paths:
                     description: OK
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
+                '403':
+                    $ref: '#/components/responses/ForbiddenError'
     /v1/groups/{groupId}/tests/{testId}/questions:
         get:
             description: get all questions for test
