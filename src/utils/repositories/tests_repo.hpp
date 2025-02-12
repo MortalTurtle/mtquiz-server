@@ -28,6 +28,10 @@ class TestsRepository {
 
   Test CreateTest(std::string_view test_name, std::string_view test_description,
                   std::string_view owner_id, std::string_view group_id);
+  void EditTest(std::string_view test_id,
+                const std::optional<std::string>& name,
+                const std::optional<std::string>& description,
+                const std::optional<int>& min_score);
 };
 }  // namespace repositories
 

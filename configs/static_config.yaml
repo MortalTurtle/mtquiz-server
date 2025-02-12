@@ -105,6 +105,11 @@ components_manager:
             method: GET
             task_processor: main-task-processor
 
+        handler-test-edit:
+            path: /v1/groups/{groupId}/tests/{id}
+            method: PATCH
+            task_processor: main-task-processor
+
         mtquiz-db-1:
             dbconnection: $dbconnection
             dbconnection#env: DB_CONNECTION

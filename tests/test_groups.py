@@ -151,6 +151,42 @@ async def test_group_edit(service_client):
     assert response_json["description"] == "newgroupdescription"
 
 
+async def test_group_edit_wrong_role(service_client):
+    user_id = await setup_for_tests.setup_user(service_client)
+    group_id = await setup_for_tests.setup_group(service_client)
+    data = {"username": 'user2', "password": "password2"}
+    response = await service_client.post(
+        '/v1/users',
+        json=data
+    )
+    assert response.status == 200
+    response = await service_client.post(
+        '/v1/users/login',
+        json=data
+    )
+    assert response.status == 200
+    auth_token = response.text
+    header = {setup_for_tests.auth_header_name: auth_token}
+    response = await service_client.post(
+        '/v1/groups/'+group_id+'/join',
+        headers=header
+    )
+    data = {"name": "newgroupname", "description": 'newgroupdescription'}
+    response = await service_client.patch(
+        '/v1/groups/' + group_id,
+        headers=header,
+        json=data
+    )
+    assert response.status == 403
+    response = await service_client.get(
+        '/v1/groups/' + group_id,
+        headers=header
+    )
+    response_json = response.json()
+    assert response_json["name"] != "newgroupname"
+    assert response_json["description"] != "newgroupdescription"
+
+
 async def test_group_edit_only_name(service_client):
     user_id = await setup_for_tests.setup_user(service_client)
     auth_token = await setup_for_tests.setup_user_login(service_client)

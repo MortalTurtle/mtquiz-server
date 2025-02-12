@@ -1,4 +1,4 @@
-#include "edit_group.hpp"
+#include "edit_test.hpp"
 
 #include <fmt/format.h>
 
@@ -12,25 +12,27 @@
 #include <userver/server/handlers/http_handler_base.hpp>
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/component.hpp>
+#include <userver/storages/postgres/exceptions.hpp>
+#include <userver/storages/postgres/io/traits.hpp>
 #include <userver/utils/assert.hpp>
 #include "lib/auth.hpp"
 #include "models/Error.hpp"
-#include "repositories/group_repo.hpp"
 #include "repositories/group_role_repo.hpp"
+#include "repositories/tests_repo.hpp"
 
 namespace mtquiz_service {
 
 namespace handlers {
-namespace groups {
+namespace tests {
 
 namespace {
 
-class EditGroup final : public userver::server::handlers::HttpHandlerBase {
+class EditTest final : public userver::server::handlers::HttpHandlerBase {
  public:
-  static constexpr std::string_view kName = "handler-group-patch";
+  static constexpr std::string_view kName = "handler-test-edit";
 
-  EditGroup(const userver::components::ComponentConfig& config,
-            const userver::components::ComponentContext& component_context)
+  EditTest(const userver::components::ComponentConfig& config,
+           const userver::components::ComponentContext& component_context)
       : HttpHandlerBase(config, component_context),
         pg_cluster_(
             component_context
@@ -46,35 +48,39 @@ class EditGroup final : public userver::server::handlers::HttpHandlerBase {
       response.SetStatus(userver::http::kUnauthorized);
       return {};
     }
-    auto group_id = request.GetPathArg("id");
+    auto group_id = request.GetPathArg("groupId");
+    auto test_id = request.GetPathArg("id");
     repositories::GroupRoleRepository role_repo(pg_cluster_);
-    auto user_role = role_repo.GetUserRoleInGroup(session->user_id, group_id);
-    repositories::GroupRepository group_repo(pg_cluster_);
-    auto group = group_repo.GetGroup(group_id);
-    if (!group.has_value()) {
-      auto& response = request.GetHttpResponse();
-      response.SetStatus(userver::http::kNotFound);
-      return {};
-    }
-    if (!user_role.has_value() || user_role != Roles::kOwner) {
+    repositories::TestsRepository tests_repo(pg_cluster_);
+    auto test = tests_repo.GetTest(test_id);
+    auto role_in_group =
+        role_repo.GetUserRoleInGroup(session->user_id, group_id);
+    if (!role_in_group.has_value() || role_in_group.value() != Roles::kOwner ||
+        (test.has_value() && test->owner_id != session->user_id)) {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::http::kForbidden);
       return {};
     }
-    auto request_body =
+    if (!test.has_value()) {
+      auto& response = request.GetHttpResponse();
+      response.SetStatus(userver::http::kNotFound);
+      return {};
+    }
+    auto response_body =
         userver::formats::json::FromString(request.RequestBody());
-    auto new_name = request_body["name"].As<std::optional<std::string>>();
-    auto new_description =
-        request_body["description"].As<std::optional<std::string>>();
-    if (!new_name.has_value() && !new_description.has_value()) {
+    auto description =
+        response_body["description"].As<std::optional<std::string>>();
+    auto name = response_body["name"].As<std::optional<std::string>>();
+    auto min_score = response_body["minScoreToBeat"].As<std::optional<int>>();
+    if (min_score.has_value() && min_score < 0) {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::http::kBadRequest);
       return ToString(userver::formats::json::ValueBuilder{
-          security::Error{"No parameters passed",
-                          security::ErrorTypes::kWrongAmountOfParameters}}
+          security::Error{"min score to beat must be more or equals than zero",
+                          security::ErrorTypes::kInvalidParameters}}
                           .ExtractValue());
     }
-    group_repo.EditGroup(group.value(), new_name, new_description);
+    tests_repo.EditTest(test_id, name, description, min_score);
     return {};
   }
 
@@ -83,10 +89,10 @@ class EditGroup final : public userver::server::handlers::HttpHandlerBase {
 
 }  // namespace
 
-void AppendEditGroup(userver::components::ComponentList& component_list) {
-  component_list.Append<EditGroup>();
+void AppendEditTest(userver::components::ComponentList& component_list) {
+  component_list.Append<EditTest>();
 }
 
-}  // namespace groups
+}  // namespace tests
 }  // namespace handlers
 }  // namespace mtquiz_service

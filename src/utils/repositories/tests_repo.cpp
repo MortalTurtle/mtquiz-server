@@ -4,6 +4,7 @@
 #include <optional>
 #include <userver/storages/postgres/cluster_types.hpp>
 #include <userver/storages/postgres/io/row_types.hpp>
+#include <userver/storages/postgres/options.hpp>
 #include <userver/storages/postgres/result_set.hpp>
 #include <vector>
 #include "models/test.hpp"
@@ -17,12 +18,12 @@ std::vector<Test> TestsRepository::GetAllTestsForGroup(
     std::optional<unsigned int> offset) {
   auto res = pg_cluster_->Execute(
       userver::storages::postgres::ClusterHostType::kSlave,
-      "SELECT * FROM quizdb.tests WHERE group_id = $1 LIMIT $2 OFFSET $3",
+      "SELECT * FROM quizdb.tests WHERE group_id = $1 ORDER BY created_ts DESC "
+      "LIMIT $2 OFFSET $3",
       group_id,
       (limit.has_value() ? (int)limit.value()
                          : std::numeric_limits<int>::max()),
-      (offset.has_value() ? (int)offset.value()
-                          : std::numeric_limits<int>::max()));
+      (offset.has_value() ? (int)offset.value() : 0));
   std::vector<Test> tests;
   std::for_each(
       res.begin(), res.end(), [&](const userver::storages::postgres::Row& row) {
@@ -49,6 +50,26 @@ Test TestsRepository::CreateTest(std::string_view test_name,
       "($1, $2, $3, $4) RETURNING *",
       group_id, owner_id, test_name, test_description);
   return res.AsSingleRow<Test>(userver::storages::postgres::kRowTag);
+}
+
+void TestsRepository::EditTest(std::string_view test_id,
+                               const std::optional<std::string>& name,
+                               const std::optional<std::string>& description,
+                               const std::optional<int>& min_score) {
+  auto transaction =
+      pg_cluster_->Begin(userver::storages::postgres::TransactionOptions{
+          userver::storages::postgres::TransactionOptions::kReadWrite});
+  if (name.has_value())
+    transaction.Execute("UPDATE quizdb.tests SET name = $1 WHERE id = $2",
+                        name.value(), test_id);
+  if (description.has_value())
+    transaction.Execute(
+        "UPDATE quizdb.tests SET description = $1 WHERE id = $2",
+        description.value(), test_id);
+  if (min_score.has_value())
+    transaction.Execute("UPDATE quizdb.tests SET min_score = $1 WHERE id = $2",
+                        min_score.value(), test_id);
+  transaction.Commit();
 }
 
 }  // namespace repositories
