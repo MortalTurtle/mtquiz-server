@@ -21,7 +21,7 @@ userver::formats::json::Value inline Serialize(
   userver::formats::json::ValueBuilder item;
   item["id"] = question.id;
   item["testId"] = question.test_id;
-  item["type"] = bimap_question_type_str.TryFindBySecond(question.type).value();
+  item["type"] = bimap_str_question_type.TryFindBySecond(question.type).value();
   if (question.weight.has_value()) item["weight"] = question.weight.value();
   item["text"] = question.text;
   return item.ExtractValue();

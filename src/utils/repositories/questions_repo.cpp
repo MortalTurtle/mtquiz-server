@@ -1,9 +1,11 @@
 #include "questions_repo.hpp"
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include <optional>
 #include <userver/storages/postgres/cluster_types.hpp>
 #include <userver/storages/postgres/io/row_types.hpp>
+#include <userver/storages/postgres/result_set.hpp>
 #include "models/question.hpp"
 
 namespace mtquiz_service {
@@ -47,6 +49,28 @@ std::vector<Question> QuestionRepostitory::GetAllQuestionInTest(
                       row.As<Question>(userver::storages::postgres::kRowTag));
                 });
   return questions;
+}
+
+void QuestionRepostitory::EditQuestion(std::string_view question_id,
+                                       const std::optional<std::string>& text,
+                                       std::optional<QuestionTypes> type,
+                                       std::optional<int> weight) {
+  auto transaction =
+      pg_cluster_->Begin(userver::storages::postgres::TransactionOptions{
+          userver::storages::postgres::TransactionOptions::kReadWrite});
+  if (text.has_value())
+    transaction.Execute(
+        "UPDATE quizdb.test_questions SET text = $1 WHERE id = $2",
+        text.value(), question_id);
+  if (type.has_value())
+    transaction.Execute(
+        "UPDATE quizdb.test_questions SET type = $1 WHERE id = $2",
+        type.value(), question_id);
+  if (weight.has_value())
+    transaction.Execute(
+        "UPDATE quizdb.test_questions SET weight = $1 WHERE id = $2",
+        weight.value(), question_id);
+  transaction.Commit();
 }
 
 }  // namespace repositories

@@ -333,3 +333,224 @@ async def test_questions_get_user_not_in_group(service_client):
         headers=header
     )
     assert response.status == 403
+
+
+async def test_questions_edit(service_client):
+    id = await setup_for_tests.setup_user(service_client)
+    auth_token = await setup_for_tests.setup_user_login(service_client)
+    group_id = await setup_for_tests.setup_group(service_client)
+    test_id = await setup_for_tests.setup_test(service_client, group_id)
+    await setup_for_tests.join_group(service_client, group_id, auth_token)
+    question_id = await setup_for_tests.setup_question(service_client, test_id)
+    header = {setup_for_tests.auth_header_name: auth_token}
+    data = {"text": "newquestiontext", "type": "Write", "weight": 2}
+    response = await service_client.patch(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header,
+        json=data
+    )
+    assert response.status == 200
+    response = await service_client.get(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header
+    )
+    response_json = response.json()
+    assert response_json["text"] == "newquestiontext"
+    assert response_json["type"] == "Write"
+    assert response_json["weight"] == 2
+
+
+async def test_questions_edit_no_header(service_client):
+    id = await setup_for_tests.setup_user(service_client)
+    auth_token = await setup_for_tests.setup_user_login(service_client)
+    group_id = await setup_for_tests.setup_group(service_client)
+    test_id = await setup_for_tests.setup_test(service_client, group_id)
+    await setup_for_tests.join_group(service_client, group_id, auth_token)
+    question_id = await setup_for_tests.setup_question(service_client, test_id)
+    header = {setup_for_tests.auth_header_name: auth_token}
+    data = {"text": "newquestiontext", "type": "Write", "weight": 2}
+    response = await service_client.patch(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        json=data
+    )
+    assert response.status == 401
+    response = await service_client.get(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header
+    )
+    response_json = response.json()
+    assert response_json["text"] != "newquestiontext"
+    assert response_json["type"] != "Write"
+    assert "weight" not in response_json
+
+
+async def test_questions_edit_user_not_joined(service_client):
+    id = await setup_for_tests.setup_user(service_client)
+    auth_token = await setup_for_tests.setup_user_login(service_client)
+    group_id = await setup_for_tests.setup_group(service_client)
+    test_id = await setup_for_tests.setup_test(service_client, group_id)
+    question_id = await setup_for_tests.setup_question(service_client, test_id)
+    header = {setup_for_tests.auth_header_name: auth_token}
+    data = {"text": "newquestiontext", "type": "Write", "weight": 2}
+    response = await service_client.patch(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header,
+        json=data
+    )
+    assert response.status == 403
+    await setup_for_tests.join_group(service_client, group_id, auth_token)
+    response = await service_client.get(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header
+    )
+    response_json = response.json()
+    assert response_json["text"] != "newquestiontext"
+    assert response_json["type"] != "Write"
+    assert "weight" not in response_json
+
+
+async def test_questions_edit_user_participant(service_client):
+    id = await setup_for_tests.setup_user(service_client)
+    auto_user2_id = await setup_for_tests.setup_user(service_client,
+                                                     "name2",
+                                                     "pswd2")
+    auth_token = await setup_for_tests.setup_user_login(service_client,
+                                                        "name2",
+                                                        "pswd2")
+    group_id = await setup_for_tests.setup_group(service_client)
+    test_id = await setup_for_tests.setup_test(service_client, group_id)
+    await setup_for_tests.join_group(service_client, group_id, auth_token)
+    question_id = await setup_for_tests.setup_question(service_client, test_id)
+    header = {setup_for_tests.auth_header_name: auth_token}
+    data = {"text": "newquestiontext", "type": "Write", "weight": 2}
+    response = await service_client.patch(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header,
+        json=data
+    )
+    assert response.status == 403
+    response = await service_client.get(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header
+    )
+    response_json = response.json()
+    assert response_json["text"] != "newquestiontext"
+    assert response_json["type"] != "Write"
+    assert "weight" not in response_json
+
+
+async def test_questions_edit_no_parameters(service_client):
+    id = await setup_for_tests.setup_user(service_client)
+    auth_token = await setup_for_tests.setup_user_login(service_client)
+    group_id = await setup_for_tests.setup_group(service_client)
+    test_id = await setup_for_tests.setup_test(service_client, group_id)
+    await setup_for_tests.join_group(service_client, group_id, auth_token)
+    question_id = await setup_for_tests.setup_question(service_client, test_id)
+    header = {setup_for_tests.auth_header_name: auth_token}
+    data = {}
+    response = await service_client.patch(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header,
+        json=data
+    )
+    assert response.status == 400
+
+
+async def test_questions_edit_only_text(service_client):
+    id = await setup_for_tests.setup_user(service_client)
+    auth_token = await setup_for_tests.setup_user_login(service_client)
+    group_id = await setup_for_tests.setup_group(service_client)
+    test_id = await setup_for_tests.setup_test(service_client, group_id)
+    await setup_for_tests.join_group(service_client, group_id, auth_token)
+    question_id = await setup_for_tests.setup_question(service_client, test_id)
+    header = {setup_for_tests.auth_header_name: auth_token}
+    data = {"text": "newquestiontext"}
+    response = await service_client.patch(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header,
+        json=data
+    )
+    assert response.status == 200
+    response = await service_client.get(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header
+    )
+    response_json = response.json()
+    assert response_json["text"] == "newquestiontext"
+    assert response_json["type"] == setup_for_tests.question_type
+    assert "weight" not in response_json
+
+
+async def test_questions_edit_only_type(service_client):
+    id = await setup_for_tests.setup_user(service_client)
+    auth_token = await setup_for_tests.setup_user_login(service_client)
+    group_id = await setup_for_tests.setup_group(service_client)
+    test_id = await setup_for_tests.setup_test(service_client, group_id)
+    await setup_for_tests.join_group(service_client, group_id, auth_token)
+    question_id = await setup_for_tests.setup_question(service_client, test_id)
+    header = {setup_for_tests.auth_header_name: auth_token}
+    data = {"type": "Write"}
+    response = await service_client.patch(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header,
+        json=data
+    )
+    assert response.status == 200
+    response = await service_client.get(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header
+    )
+    response_json = response.json()
+    assert response_json["text"] == setup_for_tests.question_text
+    assert response_json["type"] == "Write"
+    assert "weight" not in response_json
+
+
+async def test_questions_edit_only_weight(service_client):
+    id = await setup_for_tests.setup_user(service_client)
+    auth_token = await setup_for_tests.setup_user_login(service_client)
+    group_id = await setup_for_tests.setup_group(service_client)
+    test_id = await setup_for_tests.setup_test(service_client, group_id)
+    await setup_for_tests.join_group(service_client, group_id, auth_token)
+    question_id = await setup_for_tests.setup_question(service_client, test_id)
+    header = {setup_for_tests.auth_header_name: auth_token}
+    data = {"weight": 2}
+    response = await service_client.patch(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header,
+        json=data
+    )
+    assert response.status == 200
+    response = await service_client.get(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header
+    )
+    response_json = response.json()
+    assert response_json["text"] == setup_for_tests.question_text
+    assert response_json["type"] == setup_for_tests.question_type
+    assert response_json["weight"] == 2
+
+
+async def test_questions_edit_wrong_test_id(service_client):
+    id = await setup_for_tests.setup_user(service_client)
+    auth_token = await setup_for_tests.setup_user_login(service_client)
+    group_id = await setup_for_tests.setup_group(service_client)
+    test_id = await setup_for_tests.setup_test(service_client, group_id)
+    await setup_for_tests.join_group(service_client, group_id, auth_token)
+    question_id = await setup_for_tests.setup_question(service_client, test_id)
+    header = {setup_for_tests.auth_header_name: auth_token}
+    data = {"text": "newquestiontext", "type": "Write", "weight": 2}
+    response = await service_client.patch(
+        '/v1/groups/tests/' + 'wrongid' + '/questions/' + question_id,
+        headers=header,
+        json=data
+    )
+    assert response.status == 400
+    response = await service_client.get(
+        '/v1/groups/tests/' + test_id + '/questions/' + question_id,
+        headers=header
+    )
+    response_json = response.json()
+    assert response_json["text"] != "newquestiontext"
+    assert response_json["type"] != "Write"
+    assert "weight" not in response_json

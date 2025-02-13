@@ -27,6 +27,11 @@ class QuestionRepostitory {
   std::vector<Question> GetAllQuestionInTest(std::string_view test_id,
                                              std::optional<int> limit,
                                              std::optional<int> offset);
+
+  void EditQuestion(std::string_view question_id,
+                    const std::optional<std::string>& text,
+                    std::optional<QuestionTypes> type,
+                    std::optional<int> weight);
 };
 
 }  // namespace repositories

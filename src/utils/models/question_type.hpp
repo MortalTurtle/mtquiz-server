@@ -9,7 +9,7 @@
 namespace mtquiz_service {
 enum class QuestionTypes { kChooseSingle, kChooseMultiple, kWrite };
 
-static constexpr userver::utils::TrivialBiMap bimap_question_type_str =
+static constexpr userver::utils::TrivialBiMap bimap_str_question_type =
     [](auto selector) {
       return selector()
           .Case("ChooseSingle", mtquiz_service::QuestionTypes::kChooseSingle)
@@ -30,5 +30,5 @@ struct userver::storages::postgres::io::CppToUserPg<
     mtquiz_service::QuestionTypes> {
   static constexpr DBTypeName postgres_name = "quizdb.question_type";
   static constexpr USERVER_NAMESPACE::utils::TrivialBiMap enumerators =
-      mtquiz_service::bimap_question_type_str;
+      mtquiz_service::bimap_str_question_type;
 };

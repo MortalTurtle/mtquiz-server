@@ -18,6 +18,7 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/handlers/questions/get_question.cpp
     src/handlers/questions/question_create.cpp
     src/handlers/questions/questions_get.cpp
+    src/handlers/questions/edit_question.cpp
     src/handlers/tests/get_tests_for_group.cpp
     src/handlers/tests/create_test_for_group.cpp
     src/handlers/tests/get_test.cpp

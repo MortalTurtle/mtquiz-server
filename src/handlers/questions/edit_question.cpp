@@ -1,5 +1,4 @@
-#include "question_create.hpp"
-
+#include "edit_question.hpp"
 #include <fmt/format.h>
 
 #include <optional>
@@ -15,11 +14,12 @@
 #include <userver/utils/assert.hpp>
 #include "lib/auth.hpp"
 #include "models/Error.hpp"
+#include "models/group_role.hpp"
 #include "models/question_type.hpp"
-#include "repositories/group_repo.hpp"
 #include "repositories/group_role_repo.hpp"
 #include "repositories/questions_repo.hpp"
 #include "repositories/tests_repo.hpp"
+#include "repositories/user_repo.hpp"
 
 namespace mtquiz_service {
 
@@ -28,12 +28,12 @@ namespace questions {
 
 namespace {
 
-class CreateQuestion final : public userver::server::handlers::HttpHandlerBase {
+class EditQuestion final : public userver::server::handlers::HttpHandlerBase {
  public:
-  static constexpr std::string_view kName = "handler-questions-create";
+  static constexpr std::string_view kName = "handler-question-edit";
 
-  CreateQuestion(const userver::components::ComponentConfig& config,
-                 const userver::components::ComponentContext& component_context)
+  EditQuestion(const userver::components::ComponentConfig& config,
+               const userver::components::ComponentContext& component_context)
       : HttpHandlerBase(config, component_context),
         pg_cluster_(
             component_context
@@ -50,45 +50,50 @@ class CreateQuestion final : public userver::server::handlers::HttpHandlerBase {
       return {};
     }
     auto test_id = request.GetPathArg("testId");
-    repositories::GroupRoleRepository role_repo(pg_cluster_);
+    auto question_id = request.GetPathArg("id");
     repositories::TestsRepository test_repo(pg_cluster_);
+    repositories::UserRepository user_repo(pg_cluster_);
+    repositories::GroupRoleRepository role_repo(pg_cluster_);
+    auto user = user_repo.GetUserById(session->user_id);
     auto test = test_repo.GetTest(test_id);
-    if (!test.has_value()) {
+    auto request_body =
+        userver::formats::json::FromString(request.RequestBody());
+    auto type_str = request_body["type"].As<std::optional<std::string>>();
+    auto text = request_body["text"].As<std::optional<std::string>>();
+    auto weight = request_body["weight"].As<std::optional<int>>();
+    if (!test.has_value() ||
+        (!type_str.has_value() && !text.has_value() && !weight.has_value()) ||
+        (weight.has_value() && weight.value() < 0)) {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::http::kBadRequest);
       return ToString(userver::formats::json::ValueBuilder{
-          security::Error{"no such test found",
+          security::Error{"test not found or no parameters passed",
                           security::ErrorTypes::kInvalidParameters}}
                           .ExtractValue());
     }
-    auto role_in_group =
+    auto group_role =
         role_repo.GetUserRoleInGroup(session->user_id, test->group_id);
-    if (!role_in_group.has_value() || role_in_group == Roles::kParticipant ||
-        (role_in_group == Roles::kContributor &&
+    if (!user->group_id.has_value() || test->group_id != user->group_id ||
+        !group_role.has_value() || group_role == Roles::kParticipant ||
+        (group_role == Roles::kContributor &&
          test->owner_id != session->user_id)) {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::http::kForbidden);
-      return {};
-    }
-    auto request_body =
-        userver::formats::json::FromString(request.RequestBody());
-    auto question_text = request_body["text"].As<std::optional<std::string>>();
-    auto question_type_str =
-        request_body["type"].As<std::optional<std::string>>();
-    if (!question_text.has_value() || !question_type_str.has_value()) {
-      auto& response = request.GetHttpResponse();
-      response.SetStatus(userver::http::kBadRequest);
-      return ToString(userver::formats::json::ValueBuilder{
-          security::Error{"One or more parameters is missong",
-                          security::ErrorTypes::kWrongAmountOfParameters}}
-                          .ExtractValue());
+      return "You must be a part of the group of test belongs to wrong group "
+             "or your privileges are insufficient";
     }
     repositories::QuestionRepostitory question_repo(pg_cluster_);
-    auto question = question_repo.CreateQuestion(
-        bimap_str_question_type.TryFindByFirst(question_type_str.value())
-            .value(),
-        test_id, question_text.value());
-    return question.id;
+    auto question = question_repo.GetQuestion(question_id);
+    if (!question.has_value()) {
+      auto& response = request.GetHttpResponse();
+      response.SetStatus(userver::http::kNotFound);
+      return {};
+    }
+    auto type = type_str.has_value()
+                    ? bimap_str_question_type.TryFindByFirst(type_str.value())
+                    : std::nullopt;
+    question_repo.EditQuestion(question_id, text, type, weight);
+    return {};
   }
 
   userver::storages::postgres::ClusterPtr pg_cluster_;
@@ -96,8 +101,8 @@ class CreateQuestion final : public userver::server::handlers::HttpHandlerBase {
 
 }  // namespace
 
-void AppendCreateQuestion(userver::components::ComponentList& component_list) {
-  component_list.Append<CreateQuestion>();
+void AppendEditQuestion(userver::components::ComponentList& component_list) {
+  component_list.Append<EditQuestion>();
 }
 
 }  // namespace questions

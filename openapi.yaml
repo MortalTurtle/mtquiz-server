@@ -572,12 +572,6 @@ paths:
             description: edit question, updates all fields according to passed values
             parameters:
                 -   in: path
-                    name: groupid
-                    description: group id that test is attached to
-                    required: true
-                    schema:
-                        type: string
-                -   in: path
                     name: testId
                     description: testId
                     required: true
@@ -594,7 +588,20 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/question'
+                            type: object
+                            properties:
+                                text:
+                                    type: string
+                                type:
+                                    type: string
+                                    enum:
+                                        - ChooseMultiple
+                                        - ChooseSingle
+                                        - Write
+                                weight:
+                                    type: integer
+                                    description: must be more than zero
+
             security:
               - UserAuthToken: []
             responses:
@@ -604,10 +611,10 @@ paths:
                     $ref: '#/components/responses/InvalidInput'
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
-                '404':
-                    description: not found
                 '403':
                     $ref: '#/components/responses/ForbiddenError'
+                '404':
+                    description: not found
     /v1/answers:
         post:
             description: add answers or false answers for question
