@@ -33,13 +33,6 @@ components:
               - id
               - name
               - description
-        groupRole:
-            type: object
-            properties:
-                id:
-                    type: string
-                name:
-                    type: string
         test:
             type: object
             properties:
@@ -66,13 +59,18 @@ components:
                     type: string
                 testId:
                     type: string
-                typeId:
+                type:
                     type: string
+                    enum:
+                        - ChooseMultiple
+                        - ChooseSingle
+                        - Write
                 weight:
                     type: integer
                 text:
                     type: string
             required:
+              - id
               - testId
               - typeId
               - text
@@ -456,22 +454,27 @@ paths:
                     $ref: '#/components/responses/UnauthorizedError'
                 '403':
                     $ref: '#/components/responses/ForbiddenError'
-    /v1/groups/{groupId}/tests/{testId}/questions:
+    /v1/groups/tests/{testId}/questions:
         get:
             description: get all questions for test
             parameters:
-                -   in: path
-                    name: groupid
-                    description: group id that test is attached to
-                    required: true
-                    schema:
-                        type: string
                 -   in: path
                     name: testId
                     description: testId
                     required: true
                     schema:
                         type: string
+                -   in: query
+                    name: limit
+                    description: how much questions to get
+                    schema:
+                        type: integer
+                    required: false
+                -   in: query
+                    name: offset
+                    schema:
+                        type: integer
+                    required: false
             security:
               - UserAuthToken: []
             responses:
@@ -487,15 +490,11 @@ paths:
                     $ref: '#/components/responses/InvalidInput'
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
+                '403':
+                    $ref: '#/components/responses/ForbiddenError'
         post:
             description: add new question to test
             parameters:
-                -   in: path
-                    name: groupid
-                    description: group id that test is attached to
-                    required: true
-                    schema:
-                        type: string
                 -   in: path
                     name: testId
                     description: testId to attache question to
@@ -507,26 +506,39 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/question'
+                            type: object
+                            properties:
+                                text:
+                                    type: string
+                                type:
+                                    type: string
+                                    enum:
+                                        - ChooseMultiple
+                                        - ChooseSingle
+                                        - Write
+                            required:
+                              - text
+                              - type
             security:
               - UserAuthToken: []
             responses:
                 '200':
                     description: OK
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                description: id of created question
                 '400':
                     $ref: '#/components/responses/InvalidInput'
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
-    /v1/groups/{groupId}/tests/{testId}/questions/{id}:
+                '403':
+                    $ref: '#/components/responses/ForbiddenError'
+    /v1/groups/tests/{testId}/questions/{id}:
         get:
             description: get question
             parameters:
-                -   in: path
-                    name: groupid
-                    description: group id that test is attached to
-                    required: true
-                    schema:
-                        type: string
                 -   in: path
                     name: testId
                     description: testId
@@ -534,7 +546,7 @@ paths:
                     schema:
                         type: string
                 -   in: path
-                    name: Id
+                    name: id
                     description: question id to get
                     required: true
                     schema:
@@ -552,18 +564,13 @@ paths:
                     $ref: '#/components/responses/InvalidInput'
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
+                '403':
+                    $ref: '#/components/responses/ForbiddenError'
                 '404':
                     description: not found
-                
         patch:
             description: edit question, updates all fields according to passed values
             parameters:
-                -   in: path
-                    name: groupid
-                    description: group id that test is attached to
-                    required: true
-                    schema:
-                        type: string
                 -   in: path
                     name: testId
                     description: testId
@@ -581,7 +588,20 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/question'
+                            type: object
+                            properties:
+                                text:
+                                    type: string
+                                type:
+                                    type: string
+                                    enum:
+                                        - ChooseMultiple
+                                        - ChooseSingle
+                                        - Write
+                                weight:
+                                    type: integer
+                                    description: must be more than zero
+
             security:
               - UserAuthToken: []
             responses:
@@ -591,6 +611,8 @@ paths:
                     $ref: '#/components/responses/InvalidInput'
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
+                '403':
+                    $ref: '#/components/responses/ForbiddenError'
                 '404':
                     description: not found
     /v1/answers:
@@ -627,6 +649,8 @@ paths:
                     $ref: "#/components/responses/InvalidInput"
                 '401':
                     $ref: "#/components/responses/UnauthorizedError"
+                '403':
+                    $ref: '#/components/responses/ForbiddenError'
         put:
             description: replace all existing question answers or all existing false answers
             parameters:
@@ -660,6 +684,8 @@ paths:
                     $ref: "#/components/responses/InvalidInput"
                 '401':
                     $ref: "#/components/responses/UnauthorizedError"
+                '403':
+                    $ref: '#/components/responses/ForbiddenError'
     /v1/answers/submit:
         post:
             description: submit user answers on questions in test
@@ -693,6 +719,8 @@ paths:
                     $ref: '#/components/responses/UnauthorizedError'
                 '404':
                     description: test not found
+                '403':
+                    $ref: '#/components/responses/ForbiddenError'
     /v1/results:
         get:
             description: get user results in his current group, from newest to latest
@@ -730,5 +758,7 @@ paths:
                     $ref: "#/components/responses/InvalidInput"
                 '401':
                     $ref: "#/components/responses/UnauthorizedError"
+                '403':
+                    $ref: '#/components/responses/ForbiddenError'
 
 

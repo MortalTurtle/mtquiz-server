@@ -110,6 +110,26 @@ components_manager:
             method: PATCH
             task_processor: main-task-processor
 
+        handler-questions-get:
+            path: /v1/groups/tests/{testId}/questions
+            method: GET
+            task_processor: main-task-processor
+
+        handler-questions-create:
+            path: /v1/groups/tests/{testId}/questions
+            method: POST
+            task_processor: main-task-processor
+
+        handler-question-get:
+            path: /v1/groups/tests/{testId}/questions/{id}
+            method: GET
+            task_processor: main-task-processor
+
+        handler-question-edit:
+            path: /v1/groups/tests/{testId}/questions/{id}
+            method: PATCH
+            task_processor: main-task-processor
+
         mtquiz-db-1:
             dbconnection: $dbconnection
             dbconnection#env: DB_CONNECTION

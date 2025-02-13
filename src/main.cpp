@@ -10,6 +10,10 @@
 #include "handlers/groups/edit_group.hpp"
 #include "handlers/groups/get_group.hpp"
 #include "handlers/groups/join_group.hpp"
+#include "handlers/questions/edit_question.hpp"
+#include "handlers/questions/get_question.hpp"
+#include "handlers/questions/question_create.hpp"
+#include "handlers/questions/questions_get.hpp"
 #include "handlers/tests/create_test_for_group.hpp"
 #include "handlers/tests/edit_test.hpp"
 #include "handlers/tests/get_test.hpp"
@@ -41,6 +45,10 @@ int main(int argc, char* argv[]) {
   mtquiz_service::handlers::tests::AppendGetTests(component_list);
   mtquiz_service::handlers::tests::AppendGetTest(component_list);
   mtquiz_service::handlers::tests::AppendEditTest(component_list);
+  mtquiz_service::handlers::questions::AppendGetQuestion(component_list);
+  mtquiz_service::handlers::questions::AppendCreateQuestion(component_list);
+  mtquiz_service::handlers::questions::AppendQuestionsGet(component_list);
+  mtquiz_service::handlers::questions::AppendEditQuestion(component_list);
 
   return userver::utils::DaemonMain(argc, argv, component_list);
 }
