@@ -6,6 +6,8 @@ CREATE SCHEMA IF NOT EXISTS quizdb;
 
 CREATE TYPE quizdb.group_role AS ENUM('Owner', 'Contributor', 'Participant');
 
+CREATE TYPE quizdb.question_type AS ENUM('ChooseSingle', 'ChooseMultiple', 'Write');
+
 CREATE TABLE IF NOT EXISTS quizdb.groups(
     id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
@@ -44,21 +46,23 @@ CREATE TABLE IF NOT EXISTS quizdb.tests(
 
 CREATE INDEX IF NOT EXISTS idx_by_created_ts_tests ON quizdb.tests(created_ts);
 
-CREATE TABLE IF NOT EXISTS quizdb.question_type(
-    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
-    type TEXT NOT NULL,
-    description TEXT NOT NULL
+CREATE TABLE IF NOT EXISTS quizdb.question_types_description(
+    type quizdb.question_type,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    UNIQUE(type),
+    UNIQUE(name)
 );
 
-INSERT INTO quizdb.question_type(type, description) VALUES
-('Choose Single', 'You have to choose the right answer'),
-('Choose Multiple', 'You have to choose the right answers'),
-('Write', 'You have to write the right answer');
+INSERT INTO quizdb.question_types_description(type, name, description) VALUES
+('ChooseSingle', 'Choose Single', 'You have to choose the right answer'),
+('ChooseMultiple', 'Choose Multiple', 'You have to choose the right answers'),
+('Write', 'Write', 'You have to write the right answer');
 
 CREATE TABLE IF NOT EXISTS quizdb.test_questions(
     id TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
     test_id TEXT REFERENCES quizdb.tests(id),
-    type_id TEXT REFERENCES quizdb.question_type(id),
+    type quizdb.question_type,
     weight INTEGER,
     text TEXT NOT NULL,
     created_ts TIMESTAMP DEFAULT NOW()
