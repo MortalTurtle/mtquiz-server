@@ -213,7 +213,7 @@ async def test_test_edit(service_client):
     test_id = await setup_for_tests.setup_test(service_client, group_id)
     header = {setup_for_tests.auth_header_name: auth_token}
     data = {"name": "newtestname",
-            "description": "newtestdescription", "minScoreToBeat": 2}
+            "description": "newtestdescription", "minScoreToPass": 2}
     response = await service_client.patch(
         '/v1/groups/' + group_id + '/tests/' + test_id,
         headers=header,
@@ -235,7 +235,7 @@ async def test_test_edit_no_header(service_client):
     group_id = await setup_for_tests.setup_group(service_client)
     test_id = await setup_for_tests.setup_test(service_client, group_id)
     data = {"name": "newtestname",
-            "description": "newtestdescription", "minScoreToBeat": 2}
+            "description": "newtestdescription", "minScoreToPass": 2}
     response = await service_client.patch(
         '/v1/groups/' + group_id + '/tests/' + test_id,
         json=data
@@ -266,7 +266,7 @@ async def test_test_wrong_role(service_client):
     )
     assert response.status == 200
     data = {"name": "newtestname",
-            "description": "newtestdescription", "minScoreToBeat": 2}
+            "description": "newtestdescription", "minScoreToPass": 2}
     response = await service_client.patch(
         '/v1/groups/' + group_id + '/tests/' + test_id,
         headers=header,
@@ -323,7 +323,7 @@ async def test_test_edit_min_score(service_client):
     group_id = await setup_for_tests.setup_group(service_client)
     test_id = await setup_for_tests.setup_test(service_client, group_id)
     header = {setup_for_tests.auth_header_name: auth_token}
-    data = {"minScoreToBeat": 2}
+    data = {"minScoreToPass": 2}
     response = await service_client.patch(
         '/v1/groups/' + group_id + '/tests/' + test_id,
         headers=header,
@@ -345,7 +345,7 @@ async def test_test_edit_negative_min_score(service_client):
     test_id = await setup_for_tests.setup_test(service_client, group_id)
     header = {setup_for_tests.auth_header_name: auth_token}
     data = {"name": "newtestname",
-            "description": "newtestdescription", "minScoreToBeat": -2}
+            "description": "newtestdescription", "minScoreToPass": -2}
     response = await service_client.patch(
         '/v1/groups/' + group_id + '/tests/' + test_id,
         headers=header,

@@ -443,7 +443,7 @@ paths:
                                     type: string
                                 description:
                                     type: string
-                                minScoreToBeat:
+                                minScoreToPass:
                                     type: integer
             security:
               - UserAuthToken: []
@@ -616,11 +616,11 @@ paths:
                 '404':
                     description: not found
     /v1/answers:
-        post:
-            description: add answers or false answers for question
+        get:
+            description: get true or false answers for question 
             parameters:
                 -   in: query
-                    name: testId
+                    name: questionId
                     required: true
                     schema:
                         type: string
@@ -632,6 +632,37 @@ paths:
                     allowEmptyValue: true
                     schema:
                         type: boolean
+            security:
+              - UserAuthToken: []
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/answer'
+                '401':
+                    $ref: '#/components/responses/UnauthorizedError'
+                '400':
+                    $ref: '#/components/responses/InvalidInput'
+        post:
+            description: add answers or false answers for question
+            parameters:
+                -   in: query
+                    name: falseAnswers
+                    description: value is irrelevant, if passed all answers will be added as false answers
+                    required: true
+                    x-isFlag: true
+                    allowEmptyValue: true
+                    schema:
+                        type: boolean
+                -   in: query
+                    name: questionId
+                    required: true
+                    schema:
+                        type: string
             requestBody:
                 required: true
                 content:
@@ -655,7 +686,7 @@ paths:
             description: replace all existing question answers or all existing false answers
             parameters:
                 -   in: query
-                    name: testId
+                    name: questionId
                     required: true
                     schema:
                         type: string
@@ -688,7 +719,7 @@ paths:
                     $ref: '#/components/responses/ForbiddenError'
     /v1/answers/submit:
         post:
-            description: submit user answers on questions in test
+            description: submit user answers on question in test
             parameters:
                 -   in: query
                     name: testId
@@ -711,8 +742,12 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: string
-                                description: user result
+                                type: object
+                                properties:
+                                    userScore:
+                                        type: integer
+                                    minScoreToPass:
+                                        type: integer
                 '400':
                     $ref: '#/components/responses/InvalidInput'
                 '401':

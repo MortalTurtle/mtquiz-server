@@ -73,3 +73,21 @@ async def join_group(service_client, group_id, auth_token):
         '/v1/groups/'+group_id+'/join',
         headers=header
     )
+
+
+async def setup_answers(service_client, question_id):
+    auth_token = await setup_user_login(service_client)
+    header = {auth_header_name: auth_token}
+    true_answers = [{"questionId": question_id, "answer": "answer1"}]
+    response = await service_client.post(
+        '/v1/answers?questionId=' + question_id,
+        headers=header,
+        json=true_answers
+    )
+    false_answers = [{"questionId": question_id, "answer": "answer1"}, {
+        "questionId": question_id, "answer": "answer2"}]
+    response = await service_client.post(
+        '/v1/answers?questionId=' + question_id + "&falseAnswers=",
+        headers=header,
+        json=false_answers
+    )

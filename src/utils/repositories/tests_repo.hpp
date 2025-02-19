@@ -2,10 +2,12 @@
 
 #include <limits>
 #include <optional>
+#include <string>
 #include <string_view>
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/postgres_fwd.hpp>
 #include <vector>
+#include "models/question.hpp"
 #include "models/test.hpp"
 
 namespace mtquiz_service {
@@ -32,6 +34,11 @@ class TestsRepository {
                 const std::optional<std::string>& name,
                 const std::optional<std::string>& description,
                 const std::optional<int>& min_score);
+
+  std::vector<Question> GetAllQuestionsForTest(std::string_view test_id);
+
+  void SaveUserScore(std::string_view user_id, std::string_view test_id,
+                     int score);
 };
 }  // namespace repositories
 

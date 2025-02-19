@@ -7,6 +7,7 @@
 #include <userver/storages/postgres/options.hpp>
 #include <userver/storages/postgres/result_set.hpp>
 #include <vector>
+#include "models/question.hpp"
 #include "models/test.hpp"
 
 namespace mtquiz_service {
@@ -72,6 +73,27 @@ void TestsRepository::EditTest(std::string_view test_id,
   transaction.Commit();
 }
 
+std::vector<Question> TestsRepository::GetAllQuestionsForTest(
+    std::string_view test_id) {
+  auto res = pg_cluster_->Execute(
+      userver::storages::postgres::ClusterHostType::kSlave,
+      "SELECT * FROM quizdb.test_questions WHERE test_id = $1", test_id);
+  std::vector<Question> questions;
+  std::for_each(res.begin(), res.end(),
+                [&](const userver::storages::postgres::Row& row) {
+                  questions.push_back(
+                      row.As<Question>(userver::storages::postgres::kRowTag));
+                });
+  return questions;
+}
+
+void TestsRepository::SaveUserScore(std::string_view user_id,
+                                    std::string_view test_id, int score) {
+  pg_cluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
+                       "INSERT INTO quizdb.test_results(user_id, test_id, "
+                       "score) VALUES($1, $2, $3)",
+                       user_id, test_id, score);
+}
 }  // namespace repositories
 
 }  // namespace mtquiz_service

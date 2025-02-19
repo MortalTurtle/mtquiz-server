@@ -6,6 +6,10 @@
 #include <userver/storages/postgres/component.hpp>
 #include <userver/testsuite/testsuite_support.hpp>
 #include <userver/utils/daemon_run.hpp>
+#include "handlers/answers/add_answer.hpp"
+#include "handlers/answers/get_answers.hpp"
+#include "handlers/answers/replace_answers.hpp"
+#include "handlers/answers/submit_answers.hpp"
 #include "handlers/groups/create_group.hpp"
 #include "handlers/groups/edit_group.hpp"
 #include "handlers/groups/get_group.hpp"
@@ -49,6 +53,10 @@ int main(int argc, char* argv[]) {
   mtquiz_service::handlers::questions::AppendCreateQuestion(component_list);
   mtquiz_service::handlers::questions::AppendQuestionsGet(component_list);
   mtquiz_service::handlers::questions::AppendEditQuestion(component_list);
+  mtquiz_service::handlers::answers::AppendAddAnswer(component_list);
+  mtquiz_service::handlers::answers::AppendGetAnswers(component_list);
+  mtquiz_service::handlers::answers::AppendReplaceAnswers(component_list);
+  mtquiz_service::handlers::answers::AppendSubmitAnswers(component_list);
 
   return userver::utils::DaemonMain(argc, argv, component_list);
 }
