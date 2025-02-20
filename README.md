@@ -1,5 +1,5 @@
-MtQuiz server for creating tests in groups and sharing them with your friends or someone
-Contains full api specification in openapi.yaml
+MtQuiz server for creating tests in groups and sharing them with your friends or someone /n
+Contains full api specification in openapi.yaml /n
 Requires docker and docker to compose, but can be built locally someway
 
  ## Makefile
