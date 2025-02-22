@@ -15,6 +15,11 @@ userver_setup_environment()
 
 # Common sources
 add_library(${PROJECT_NAME}_objs OBJECT
+    src/handlers/results/results_get.cpp
+    src/handlers/answers/add_answer.cpp
+    src/handlers/answers/replace_answers.cpp
+    src/handlers/answers/submit_answers.cpp
+    src/handlers/answers/get_answers.cpp
     src/handlers/questions/get_question.cpp
     src/handlers/questions/question_create.cpp
     src/handlers/questions/questions_get.cpp
@@ -32,6 +37,7 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/handlers/users/edit-user.cpp
     src/handlers/users/get-user.cpp
     src/utils/lib/auth.cpp
+    src/utils/lib/checker.cpp
     src/utils/repositories/user_repo.cpp
     src/utils/repositories/group_repo.cpp
     src/utils/repositories/group_role_repo.cpp

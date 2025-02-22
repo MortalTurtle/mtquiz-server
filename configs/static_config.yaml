@@ -130,6 +130,31 @@ components_manager:
             method: PATCH
             task_processor: main-task-processor
 
+        handler-answers-add:
+            path: /v1/answers
+            method: POST
+            task_processor: main-task-processor
+
+        handler-results-get:
+            path: /v1/results
+            method: GET
+            task_processor: main-task-processor
+
+        handler-answers-replace:
+            path: /v1/answers
+            method: PUT
+            task_processor: main-task-processor
+
+        handler-answers-submit:
+            path: /v1/answers/submit
+            method: POST
+            task_processor: main-task-processor
+        
+        handler-answers-get:
+            path: /v1/answers
+            method: GET
+            task_processor: main-task-processor
+
         mtquiz-db-1:
             dbconnection: $dbconnection
             dbconnection#env: DB_CONNECTION

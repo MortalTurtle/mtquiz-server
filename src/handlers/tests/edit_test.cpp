@@ -71,7 +71,7 @@ class EditTest final : public userver::server::handlers::HttpHandlerBase {
     auto description =
         response_body["description"].As<std::optional<std::string>>();
     auto name = response_body["name"].As<std::optional<std::string>>();
-    auto min_score = response_body["minScoreToBeat"].As<std::optional<int>>();
+    auto min_score = response_body["minScoreToPass"].As<std::optional<int>>();
     if (min_score.has_value() && min_score < 0) {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::http::kBadRequest);

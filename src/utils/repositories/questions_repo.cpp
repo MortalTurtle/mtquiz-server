@@ -3,9 +3,12 @@
 #include <limits>
 #include <memory>
 #include <optional>
+#include <string_view>
 #include <userver/storages/postgres/cluster_types.hpp>
 #include <userver/storages/postgres/io/row_types.hpp>
 #include <userver/storages/postgres/result_set.hpp>
+#include <vector>
+#include "models/answer.hpp"
 #include "models/question.hpp"
 
 namespace mtquiz_service {
@@ -14,12 +17,13 @@ namespace repositories {
 
 Question QuestionRepostitory::CreateQuestion(QuestionTypes type,
                                              std::string_view test_id,
-                                             std::string_view question_text) {
+                                             std::string_view question_text,
+                                             int weight) {
   auto res = pg_cluster_->Execute(
       userver::storages::postgres::ClusterHostType::kMaster,
-      "INSERT INTO quizdb.test_questions(type, text, test_id) "
-      "VALUES ($1, $2, $3) RETURNING *",
-      type, question_text, test_id);
+      "INSERT INTO quizdb.test_questions(type, text, test_id, weight) "
+      "VALUES ($1, $2, $3, $4) RETURNING *",
+      type, question_text, test_id, weight);
   return res.AsSingleRow<Question>(userver::storages::postgres::kRowTag);
 }
 
@@ -71,6 +75,40 @@ void QuestionRepostitory::EditQuestion(std::string_view question_id,
         "UPDATE quizdb.test_questions SET weight = $1 WHERE id = $2",
         weight.value(), question_id);
   transaction.Commit();
+}
+
+std::unordered_set<Answer> QuestionRepostitory::GetAnswers(
+    std::string_view question_id, bool is_true_answers) {
+  std::string table_name = TableName(is_true_answers);
+  auto result = pg_cluster_->Execute(
+      userver::storages::postgres::ClusterHostType::kSlave,
+      "SELECT * FROM quizdb." + table_name + " WHERE question_id = $1",
+      question_id);
+  std::unordered_set<Answer> answers;
+  std::for_each(
+      result.begin(), result.end(),
+      [&](const userver::storages::postgres::Row& row) {
+        answers.insert(row.As<Answer>(userver::storages::postgres::kRowTag));
+      });
+  return answers;
+}
+
+void QuestionRepostitory::AddAnswer(Answer answer, bool is_false_answer) {
+  std::string table_name = TableName(!is_false_answer);
+  pg_cluster_->Execute(
+      userver::storages::postgres::ClusterHostType::kMaster,
+      "INSERT INTO quizdb." + table_name +
+          "(question_id, answer) VALUES($1, $2) ON CONFLICT DO NOTHING",
+      answer.question_id, answer.answer);
+}
+
+void QuestionRepostitory::ClearAnswers(std::string_view question_id,
+                                       bool are_true_answers) {
+  std::string table_name = TableName(are_true_answers);
+  pg_cluster_->Execute(
+      userver::storages::postgres::ClusterHostType::kMaster,
+      "DELETE FROM quizdb." + table_name + " WHERE question_id = $1",
+      question_id);
 }
 
 }  // namespace repositories
