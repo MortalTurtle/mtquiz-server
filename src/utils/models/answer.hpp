@@ -23,8 +23,8 @@ userver::formats::json::Value inline Serialize(
 }
 
 bool inline operator==(const Answer& lhs, const Answer& rhs) {
-  return boost::algorithm::to_lower_copy(lhs.answer) == 
-    boost::algorithm::to_lower_copy(rhs.answer);
+  return boost::algorithm::to_lower_copy(lhs.answer) ==
+         boost::algorithm::to_lower_copy(rhs.answer);
 }
 
 Answer inline Parse(userver::formats::json::Value value,

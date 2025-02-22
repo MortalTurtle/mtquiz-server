@@ -17,12 +17,13 @@ namespace repositories {
 
 Question QuestionRepostitory::CreateQuestion(QuestionTypes type,
                                              std::string_view test_id,
-                                             std::string_view question_text) {
+                                             std::string_view question_text,
+                                             int weight) {
   auto res = pg_cluster_->Execute(
       userver::storages::postgres::ClusterHostType::kMaster,
-      "INSERT INTO quizdb.test_questions(type, text, test_id) "
-      "VALUES ($1, $2, $3) RETURNING *",
-      type, question_text, test_id);
+      "INSERT INTO quizdb.test_questions(type, text, test_id, weight) "
+      "VALUES ($1, $2, $3, $4) RETURNING *",
+      type, question_text, test_id, weight);
   return res.AsSingleRow<Question>(userver::storages::postgres::kRowTag);
 }
 

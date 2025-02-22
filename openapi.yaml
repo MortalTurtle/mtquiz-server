@@ -83,6 +83,15 @@ components:
             required:
                 - questionId
                 - answer
+        testResult:
+            type: object
+            properties:
+                userId:
+                    type: string
+                testId:
+                    type: string
+                score:
+                    type: integer
         error:
             type: object
             properties:
@@ -367,6 +376,9 @@ paths:
                                 description:
                                     type: string
                                     description: group description
+                                minScoreToPass:
+                                    type: integer
+                                    default: 0
                             required:
                               - name
                               - description
@@ -516,6 +528,9 @@ paths:
                                         - ChooseMultiple
                                         - ChooseSingle
                                         - Write
+                                weight:
+                                    type: integer
+                                    default: 0
                             required:
                               - text
                               - type
@@ -770,6 +785,12 @@ paths:
                     required: false
                     schema:
                         type: integer
+                -   in: query
+                    name: testId
+                    description: if passed will return results only for this test
+                    required: false
+                    schema:
+                        type: string
             security:
               - UserAuthToken: []
             responses:
@@ -780,20 +801,10 @@ paths:
                             schema:
                                 type: array
                                 items:
-                                    type: object
-                                    properties:
-                                        test:
-                                            $ref: "#/components/schemas/test"
-                                        score:
-                                            type: integer
-                                    required:
-                                      - test
-                                      - score
+                                    $ref: '#/components/schemas/testResult'
                 '400':
                     $ref: "#/components/responses/InvalidInput"
                 '401':
                     $ref: "#/components/responses/UnauthorizedError"
-                '403':
-                    $ref: '#/components/responses/ForbiddenError'
 
 

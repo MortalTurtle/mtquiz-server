@@ -15,6 +15,7 @@ userver_setup_environment()
 
 # Common sources
 add_library(${PROJECT_NAME}_objs OBJECT
+    src/handlers/results/results_get.cpp
     src/handlers/answers/add_answer.cpp
     src/handlers/answers/replace_answers.cpp
     src/handlers/answers/submit_answers.cpp

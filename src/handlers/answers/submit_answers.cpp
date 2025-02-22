@@ -110,10 +110,9 @@ class SubmitAnswers final : public userver::server::handlers::HttpHandlerBase {
     }
     test_repo.SaveUserScore(session->user_id, test_id, totalScore);
     userver::formats::json::ValueBuilder item;
-    item["userScore"] = std::to_string(totalScore);
-    item["minScoreToPass"] = test->min_score.has_value()
-                                 ? std::to_string(test->min_score.value())
-                                 : "";
+    item["userScore"] = totalScore;
+    item["minScoreToPass"] =
+        test->min_score.has_value() ? test->min_score.value() : 0;
     return ToString(item.ExtractValue());
   }
 

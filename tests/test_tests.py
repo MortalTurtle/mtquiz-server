@@ -359,4 +359,3 @@ async def test_test_edit_negative_min_score(service_client):
     response_json = response.json()
     assert response_json["name"] != "newtestname"
     assert response_json["description"] != "newtestdescription"
-    assert "minScore" not in response_json

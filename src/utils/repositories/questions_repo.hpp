@@ -25,7 +25,7 @@ class QuestionRepostitory {
       : pg_cluster_(pg_cluster) {}
 
   Question CreateQuestion(QuestionTypes type, std::string_view test_id,
-                          std::string_view question_text);
+                          std::string_view question_text, int weight);
 
   std::optional<Question> GetQuestion(std::string_view question_id);
 

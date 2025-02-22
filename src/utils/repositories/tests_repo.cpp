@@ -43,13 +43,15 @@ std::optional<Test> TestsRepository::GetTest(std::string_view test_id) {
 
 Test TestsRepository::CreateTest(std::string_view test_name,
                                  std::string_view test_description,
+                                 int min_score_to_pass,
                                  std::string_view owner_id,
                                  std::string_view group_id) {
   auto res = pg_cluster_->Execute(
       userver::storages::postgres::ClusterHostType::kMaster,
-      "INSERT INTO quizdb.tests(group_id, owner_id, name, description) VALUES "
-      "($1, $2, $3, $4) RETURNING *",
-      group_id, owner_id, test_name, test_description);
+      "INSERT INTO quizdb.tests(group_id, owner_id, name, description, "
+      "min_score) VALUES "
+      "($1, $2, $3, $4, $5) RETURNING *",
+      group_id, owner_id, test_name, test_description, min_score_to_pass);
   return res.AsSingleRow<Test>(userver::storages::postgres::kRowTag);
 }
 

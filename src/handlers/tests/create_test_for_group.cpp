@@ -53,6 +53,8 @@ class CreateTest final : public userver::server::handlers::HttpHandlerBase {
     auto test_name = request_body["name"].As<std::optional<std::string>>();
     auto test_description =
         request_body["description"].As<std::optional<std::string>>();
+    auto min_score_to_pass =
+        request_body["minScoreToPass"].As<std::optional<int>>();
     if (!test_name.has_value() || !test_description.has_value()) {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::http::kBadRequest);
@@ -62,9 +64,10 @@ class CreateTest final : public userver::server::handlers::HttpHandlerBase {
                           .ExtractValue());
     }
     try {
-      auto test =
-          tests_repo.CreateTest(test_name.value(), test_description.value(),
-                                session->user_id, group_id);
+      auto test = tests_repo.CreateTest(
+          test_name.value(), test_description.value(),
+          min_score_to_pass.has_value() ? min_score_to_pass.value() : 0,
+          session->user_id, group_id);
       return test.id;
     } catch (userver::storages::postgres::ForeignKeyViolation ex) {
       auto& response = request.GetHttpResponse();

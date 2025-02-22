@@ -381,7 +381,7 @@ async def test_questions_edit_no_header(service_client):
     response_json = response.json()
     assert response_json["text"] != "newquestiontext"
     assert response_json["type"] != "Write"
-    assert "weight" not in response_json
+    assert response_json["weight"] == 0
 
 
 async def test_questions_edit_user_not_joined(service_client):
@@ -406,7 +406,7 @@ async def test_questions_edit_user_not_joined(service_client):
     response_json = response.json()
     assert response_json["text"] != "newquestiontext"
     assert response_json["type"] != "Write"
-    assert "weight" not in response_json
+    assert response_json["weight"] == 0
 
 
 async def test_questions_edit_user_participant(service_client):
@@ -436,7 +436,7 @@ async def test_questions_edit_user_participant(service_client):
     response_json = response.json()
     assert response_json["text"] != "newquestiontext"
     assert response_json["type"] != "Write"
-    assert "weight" not in response_json
+    assert response_json["weight"] == 0
 
 
 async def test_questions_edit_no_parameters(service_client):
@@ -478,7 +478,7 @@ async def test_questions_edit_only_text(service_client):
     response_json = response.json()
     assert response_json["text"] == "newquestiontext"
     assert response_json["type"] == setup_for_tests.question_type
-    assert "weight" not in response_json
+    assert response_json["weight"] == 0
 
 
 async def test_questions_edit_only_type(service_client):
@@ -503,7 +503,7 @@ async def test_questions_edit_only_type(service_client):
     response_json = response.json()
     assert response_json["text"] == setup_for_tests.question_text
     assert response_json["type"] == "Write"
-    assert "weight" not in response_json
+    assert response_json["weight"] == 0
 
 
 async def test_questions_edit_only_weight(service_client):
@@ -553,4 +553,4 @@ async def test_questions_edit_wrong_test_id(service_client):
     response_json = response.json()
     assert response_json["text"] != "newquestiontext"
     assert response_json["type"] != "Write"
-    assert "weight" not in response_json
+    assert response_json["weight"] == 0

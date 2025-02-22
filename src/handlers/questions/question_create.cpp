@@ -75,6 +75,7 @@ class CreateQuestion final : public userver::server::handlers::HttpHandlerBase {
     auto question_text = request_body["text"].As<std::optional<std::string>>();
     auto question_type_str =
         request_body["type"].As<std::optional<std::string>>();
+    auto weight = request_body["weight"].As<std::optional<int>>();
     if (!question_text.has_value() || !question_type_str.has_value()) {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::http::kBadRequest);
@@ -87,7 +88,8 @@ class CreateQuestion final : public userver::server::handlers::HttpHandlerBase {
     auto question = question_repo.CreateQuestion(
         bimap_str_question_type.TryFindByFirst(question_type_str.value())
             .value(),
-        test_id, question_text.value());
+        test_id, question_text.value(),
+        weight.has_value() ? weight.value() : 0);
     return question.id;
   }
 

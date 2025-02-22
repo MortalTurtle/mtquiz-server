@@ -135,7 +135,11 @@ components_manager:
             method: POST
             task_processor: main-task-processor
 
-        
+        handler-results-get:
+            path: /v1/results
+            method: GET
+            task_processor: main-task-processor
+
         handler-answers-replace:
             path: /v1/answers
             method: PUT

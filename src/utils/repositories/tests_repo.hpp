@@ -29,7 +29,8 @@ class TestsRepository {
   std::optional<Test> GetTest(std::string_view test_id);
 
   Test CreateTest(std::string_view test_name, std::string_view test_description,
-                  std::string_view owner_id, std::string_view group_id);
+                  int min_score_to_pass, std::string_view owner_id,
+                  std::string_view group_id);
   void EditTest(std::string_view test_id,
                 const std::optional<std::string>& name,
                 const std::optional<std::string>& description,
