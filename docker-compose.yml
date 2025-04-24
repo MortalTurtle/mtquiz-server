@@ -35,6 +35,16 @@ services:
           - postgres
         networks:
           - postgres
+    
+    proxy:
+      image: nginx:latest
+      volumes:
+        - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+      ports:
+        - 80:80
+      depends_on:
+        - postgres
+        - mtquiz_service-container
 
 networks:
     postgres:

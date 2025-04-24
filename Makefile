@@ -68,7 +68,7 @@ $(addprefix --in-docker-start-, $(PRESETS)): --in-docker-start-%: install-%
 	psql ${DB_CONNECTION} -f ./postgresql/data/initial_data.sql
 	/home/user/.local/bin/$(PROJECT_NAME) \
 		--config /home/user/.local/etc/$(PROJECT_NAME)/static_config.yaml \
-		--config_vars /home/user/.local/etc/$(PROJECT_NAME)/config_vars.docker.yaml
+		--config_vars /home/user/.local/etc/$(PROJECT_NAME)/config_vars.yaml
 
 # Build and run service in docker environment
 .PHONY: $(addprefix docker-start-, $(PRESETS))
