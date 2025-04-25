@@ -75,8 +75,18 @@ class AddUser final : public userver::server::handlers::HttpHandlerBase {
                           .ExtractValue());
     }
     repositories::UserRepository user_repo(pg_cluster_);
-    auto user = user_repo.CrateUser(username.value(), password.value());
-    return user.id;
+    auto user = user_repo.GetUserByUsername(username.value());
+    if (user.has_value()) {
+      auto& response = request.GetHttpResponse();
+      response.SetStatus(userver::http::BadRequest);
+      return ToString(userver::formats::json::ValueBuilder{
+          security::Error{
+              "username is taken",
+              security::ErrorTypes::kInvalidParameters}}
+                          .ExtractValue());
+    }
+    user = user_repo.CrateUser(username.value(), password.value());
+    return user.value().id;
   }
 
   userver::storages::postgres::ClusterPtr pg_cluster_;
