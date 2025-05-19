@@ -30,6 +30,7 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/handlers/tests/edit_test.cpp
     src/handlers/groups/create_group.cpp
     src/handlers/groups/get_group.cpp
+    src/handlers/groups/get_role.cpp
     src/handlers/groups/edit_group.cpp
     src/handlers/groups/join_group.cpp
     src/handlers/users/login/user-login.cpp

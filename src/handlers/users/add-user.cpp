@@ -80,9 +80,8 @@ class AddUser final : public userver::server::handlers::HttpHandlerBase {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::http::BadRequest);
       return ToString(userver::formats::json::ValueBuilder{
-          security::Error{
-              "username is taken",
-              security::ErrorTypes::kInvalidParameters}}
+          security::Error{"username is taken",
+                          security::ErrorTypes::kInvalidParameters}}
                           .ExtractValue());
     }
     user = user_repo.CrateUser(username.value(), password.value());

@@ -13,6 +13,7 @@
 #include "handlers/groups/create_group.hpp"
 #include "handlers/groups/edit_group.hpp"
 #include "handlers/groups/get_group.hpp"
+#include "handlers/groups/get_role.hpp"
 #include "handlers/groups/join_group.hpp"
 #include "handlers/questions/edit_question.hpp"
 #include "handlers/questions/get_question.hpp"
@@ -42,6 +43,7 @@ int main(int argc, char* argv[]) {
   mtquiz_service::handlers::groups::AppendGetGroup(component_list);
   mtquiz_service::handlers::groups::AppendEditGroup(component_list);
   mtquiz_service::handlers::groups::AppendJoinGroup(component_list);
+  mtquiz_service::handlers::groups::AppendGetGroupRole(component_list);
   mtquiz_service::handlers::users::AppendAddUser(component_list);
   mtquiz_service::handlers::users::AppendEditUser(component_list);
   mtquiz_service::handlers::users::AppendGetUser(component_list);

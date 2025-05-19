@@ -70,6 +70,18 @@ async def test_group_get(service_client):
     assert 'id' in response_json
     assert 'name' in response_json
     assert 'description' in response_json
+    
+async def test_get_group_role(service_client):
+    user_id = await setup_for_tests.setup_user(service_client)
+    auth_token = await setup_for_tests.setup_user_login(service_client)
+    header = {setup_for_tests.auth_header_name: auth_token}
+    group_id = await setup_for_tests.setup_group(service_client)
+    response = await service_client.get(
+        '/v1/groups/' + group_id + '/roles',
+        headers=header
+    )
+    assert response.status == 200
+    assert response.text == 'kOwner'
 
 
 async def test_group_get_wrong_id(service_client):
