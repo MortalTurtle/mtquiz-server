@@ -317,6 +317,34 @@ paths:
                     description: group not found
                 '401':
                     $ref: '#/components/responses/UnauthorizedError'
+    /v1/groups/{id}/roles:
+        get:
+            description: get user role in group
+            parameters:
+                -   in: path
+                    name: id
+                    description: ger user role in group
+                    required: true
+                    schema:
+                        type: string
+            security:
+              - UserAuthToken: []
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                description: user role in group
+                                enum:
+                                    - kOwner
+                                    - kContributor
+                                    - kParticipant
+                '404':
+                    description: group not found
+                '401':
+                    $ref: '#/components/responses/UnauthorizedError'
     /v1/groups/{groupId}/tests:
         get:
             description: get all tests for group

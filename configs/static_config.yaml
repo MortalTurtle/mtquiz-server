@@ -80,6 +80,11 @@ components_manager:
             method: GET
             task_processor: main-task-processor
 
+        handler-group-get-role:
+            path: /v1/groups/{id}/roles
+            method: GET
+            task_processor: main-task-processor
+
         handler-group-patch:
             path: /v1/groups/{id}
             method: PATCH
